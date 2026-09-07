@@ -918,24 +918,19 @@ function drawWalls(){
   // fundos da suíte: JANELA, não porta — o quarto do fim não tem saída para o quintal
   line(20.20,4.60,20.20,6.00,'var(--planFill)',8); line(20.20,4.60,20.20,6.00,'var(--aco)',2);
 
-  const q1p=amb2('q1'), bhp=amb2('banho');
+  const q1p=amb2('q1'), bhp=amb2('banho'), vo=amb2('vao1');
 
-  // PORTA DO QUARTO 01, na parede do nicho, encostada na divisória do banheiro
-  if(q1p){
-    const a=q1p.x+q1p.w-1.05, b=q1p.x+q1p.w-0.15;
-    line(a,3.40,b,3.40,'var(--planFill)',8);
-    root.appendChild(svg('path',{d:`M${mx(a)} ${my(3.40)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(a)} ${my(3.40+(b-a))}`,
-      fill:'none',stroke:'var(--ink2)','stroke-width':1.1}));
-  }
-  // O VÃO do canto abre no quarto 01 pela largura toda, sem porta. É um recuo,
-  // não um cômodo — e é dentro dele que fica a porta do banheiro.
-  const vo=amb2('vao1');
-  if(q1p&&vo) line(q1p.x+q1p.w,vo.y, q1p.x+q1p.w,vo.y+vo.h,'var(--planFill)',8);
-  // porta do banheiro, na parede y=5,60, no plano da parede — sem giro para fora
-  if(bhp&&vo){
-    const a=bhp.x+0.25, b=bhp.x+0.95;
-    line(a,vo.y,b,vo.y,'var(--planFill)',8);
-    line(a,vo.y,b,vo.y,'var(--ink3)',1.6);
+  /* AS TRÊS PORTAS DO VÃO. O quarto 01 NÃO tem acesso pelo lado de fora: quem
+     entra no quarto passa obrigatoriamente por este vão de 0,96 m², e é nele
+     que ficam também a porta do banheiro e a ligação com a sala. */
+  if(vo){
+    const a=vo.y+0.05, b=vo.y+0.75;
+    // porta do quarto 01, na divisória x=8,00
+    if(q1p) line(q1p.x+q1p.w,a, q1p.x+q1p.w,b,'var(--planFill)',8);
+    // ligação do vão com a sala, na parede x=9,20 — é por aqui que se chega
+    line(vo.x+vo.w,a, vo.x+vo.w,b,'var(--planFill)',8);
+    // porta do banheiro, na parede y=5,60, no plano da parede
+    if(bhp) line(bhp.x+0.25,vo.y, bhp.x+0.95,vo.y,'var(--planFill)',8);
   }
   line(9.20,2.55,9.20,3.35,'var(--planFill)',8);
   root.appendChild(svg('path',{d:`M${mx(9.20)} ${my(3.35)} A${0.80*S} ${0.80*S} 0 0 1 ${mx(10.00)} ${my(3.35)}`,

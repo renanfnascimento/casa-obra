@@ -255,8 +255,9 @@ function montaCasa(){
      existe: a boca do corredorzinho é aberta, é por ela que se entra.        */
   const bh=amb('banho'), q1x=q1?q1.x+q1.w:null;
   if(N){
+    // NENHUMA porta aqui: não existe acesso ao quarto pelo lado de fora da casa.
+    // Só a basculante do banheiro, que é o que ventila.
     const v=[];
-    if(q1) v.push([q1.x+q1.w-1.05, q1.x+q1.w-0.15, base, base+H.porta]);
     if(bh) v.push([bh.x+0.25, bh.x+0.95, base+H.basc, base+H.basc+H.bascAlt]);
     parede(g,'x',nz1, L.x0, fx0, base, topo, v, mExt, mInt, {etapa:1}, -1);
     if(bh) esquadria(g,'x',nz1-0.07, bh.x+0.25, bh.x+0.95,
@@ -305,13 +306,17 @@ function montaCasa(){
   // Divisória entre o quarto 01 e o banheiro. Ela para em y=5,60: dali até a divisa
   // cega fica o VÃO, um recuo aberto no quarto, e é nele que mora a porta do banheiro.
   const vo=amb('vao1');
-  if(q1) parede(g,'z',q1.x+q1.w, q1.y, vo?vo.y:q1.y+q1.h, base, topo, [], mi, mi, {etapa:1});
-  // parede do banheiro contra o vão, com a porta
+  // divisória do quarto, inteira, com a PORTA DO QUARTO dentro do vão
+  if(q1) parede(g,'z',q1.x+q1.w, q1.y, q1.y+q1.h, base, topo,
+    vo?[[vo.y+0.05, vo.y+0.75, base, base+H.porta]]:[], mi, mi, {etapa:1});
+  // porta do banheiro, na parede do vão
   if(bh&&vo) parede(g,'x',vo.y, bh.x, bh.x+bh.w, base, topo,
     [[bh.x+0.25, bh.x+0.95, base, base+H.porta]], mi, mi, {etapa:1}, +1);
-  // parede do banheiro e do vão contra a sala
+  // banheiro contra a sala: parede cheia
   if(bh) parede(g,'z',bh.x+bh.w, bh.y, bh.y+bh.h, base, topo, [], mi, mi, {etapa:1});
-  if(vo) parede(g,'z',vo.x+vo.w, vo.y, vo.y+vo.h, base, topo, [], mi, mi, {etapa:1});
+  // vão contra a sala: é POR AQUI que se chega ao vão, e daí ao quarto
+  if(vo) parede(g,'z',vo.x+vo.w, vo.y, vo.y+vo.h, base, topo,
+    [[vo.y+0.05, vo.y+0.75, base, base+H.porta]], mi, mi, {etapa:1});
   if(sala) parede(g,'z',sala.x+sala.w, sala.y, sala.y+sala.h, base, topo,
     [[sala.y+0.15, sala.y+0.95, base, base+H.porta]], mi, mi, {etapa:3});
   if(bs){
