@@ -250,18 +250,13 @@ function montaCasa(){
   if(q1) esquadria(g,'z',L.x0+0.07, q1.y+0.60, q1.y+2.40,
     base+H.peitoril, base+H.peitoril+H.janela, {etapa:1});
 
-  /* --- parede que dá para o nicho: as portas do quarto e do banheiro ----- */
-  const bh=amb('banho');
+  /* --- parede que dá para o nicho -----------------------------------------
+     Só existe na frente do quarto 01. Na frente do corredor de acesso ela NÃO
+     existe: a boca do corredorzinho é aberta, é por ela que se entra.        */
+  const bh=amb('banho'), cr=amb('corr1');
   if(N){
-    const vaos=[];
-    // portas na PONTA de cada parede, do lado da sala — mesma posição do 2D
-    if(q1) vaos.push([q1.x+q1.w-1.05, q1.x+q1.w-0.15, base, base+H.porta]);
-    if(bh) vaos.push([bh.x+bh.w-0.85, bh.x+bh.w-0.15, base, base+H.porta]);
-    // basculante do banheiro vai para a outra ponta, longe da porta
-    if(bh) vaos.push([bh.x+0.20, bh.x+0.80, base+H.basc, base+H.basc+H.bascAlt]);
-    parede(g,'x',nz1, L.x0, fx0, base, topo, vaos, mExt, mInt, {etapa:1}, -1);
-    if(bh) esquadria(g,'x',nz1-0.07, bh.x+0.20, bh.x+0.80,
-      base+H.basc, base+H.basc+H.bascAlt, {etapa:1});
+    const fim = cr ? cr.x : fx0;      // para antes da boca do corredor
+    parede(g,'x',nz1, L.x0, fim, base, topo, [], mExt, mInt, {etapa:1}, -1);
   }
 
   /* --- fundo do nicho: a porta de entrada -------------------------------- */
@@ -300,8 +295,17 @@ function montaCasa(){
 
   /* --- paredes internas -------------------------------------------------- */
   const mi=mat(C.interna);
-  if(bh) parede(g,'z',bh.x, bh.y, bh.y+bh.h, base, topo, [], mi, mi, {etapa:1});
+  // divisória do quarto: vai do nicho até a divisa cega e leva a PORTA DO QUARTO,
+  // que agora abre para o corredorzinho de acesso
+  if(q1) parede(g,'z',q1.x+q1.w, q1.y, q1.y+q1.h, base, topo,
+    cr?[[cr.y+0.05, cr.y+0.75, base, base+H.porta]]:[], mi, mi, {etapa:1});
+  // parede do banheiro de frente para o corredorzinho, com a porta e a basculante
+  if(bh) parede(g,'x',bh.y, bh.x, bh.x+bh.w, base, topo,
+    [[bh.x+0.25, bh.x+0.95, base, base+H.porta],
+     [bh.x+0.30, bh.x+0.90, base+H.basc, base+H.basc+H.bascAlt]], mi, mi, {etapa:1}, -1);
   if(bh) parede(g,'z',bh.x+bh.w, bh.y, bh.y+bh.h, base, topo, [], mi, mi, {etapa:1});
+  // parede do corredorzinho contra a sala
+  if(cr) parede(g,'z',cr.x+cr.w, cr.y, cr.y+cr.h, base, topo, [], mi, mi, {etapa:1});
   if(sala) parede(g,'z',sala.x+sala.w, sala.y, sala.y+sala.h, base, topo,
     [[sala.y+0.15, sala.y+0.95, base, base+H.porta]], mi, mi, {etapa:3});
   if(bs){
@@ -368,7 +372,7 @@ function montaMobilia(){
     bloco(g, bx,bz, bx+0.04,bz+0.95, base,base+1.90, mat(C.preto,{transparent:true,opacity:0.75}), {etapa:et});
     bloco(g, bx,bz, bx+0.95,bz+0.04, base,base+1.90, mat(C.preto,{transparent:true,opacity:0.75}), {etapa:et});
     // pia recuada, para não ficar atrás do giro da porta
-    bloco(g, b.x+0.15,b.y+0.80, b.x+0.65,b.y+1.25, base+0.80,base+0.92, mat(C.bancada), {etapa:et});
+    bloco(g, b.x+0.15,b.y+0.30, b.x+0.65,b.y+0.75, base+0.80,base+0.92, mat(C.bancada), {etapa:et});
   });
 }
 
