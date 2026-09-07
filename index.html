@@ -145,6 +145,16 @@ ul.chk li.done .txt{opacity:.5;text-decoration:line-through}
 .v3leg span{display:inline-flex;align-items:center;gap:6px}
 .v3leg i{width:16px;height:9px;border:1px solid var(--rule2);display:inline-block}
 .empty{color:var(--ink3);font-style:italic;padding:16px 0;text-align:left}
+.backup{margin-top:48px;background:var(--surface);border:1px solid var(--rule2);padding:18px 20px}
+.backup h3{margin:0 0 8px;font-size:15px}
+.backup p{margin:0 0 14px;font-size:13.5px;color:var(--ink2);max-width:70ch}
+.bkbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bkmsg{font-family:var(--mono);font-size:11.5px;color:var(--ink3)}
+.bkmsg.ok{color:var(--ok);font-weight:600}
+.bkmsg.bad{color:var(--terra);font-weight:600}
+#bkConfirm{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule2);
+  font-size:13.5px;color:var(--ink2)}
+#bkConfirm ul{margin:8px 0 12px;padding-left:20px;font-family:var(--mono);font-size:12px}
 footer{margin-top:56px;border-top:1px solid var(--rule);padding-top:16px;font-size:12.5px;color:var(--ink3)}
 </style>
 </head>
@@ -364,10 +374,25 @@ footer{margin-top:56px;border-top:1px solid var(--rule);padding-top:16px;font-si
   <div class="tablewrap"><table id="gastosTable"></table></div>
 </section>
 
+<section class="backup" id="backup">
+  <h3>Levar seus dados para outro aparelho</h3>
+  <p>O que você digita — gastos, achados marcados como comprados, o simulador e os ajustes da
+  planta — fica salvo <b>só neste navegador</b>. Não vai sozinho para o celular nem volta dele.
+  Para passar de um para o outro: <b>exporte</b> aqui, mande o arquivo para você mesmo (WhatsApp,
+  e-mail, o que for) e <b>importe</b> no outro aparelho.</p>
+  <div class="bkbar">
+    <button class="act" id="btExport" type="button">Exportar meus dados</button>
+    <label class="act ghost" for="fileImport" style="cursor:pointer">Importar de um arquivo</label>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <span class="bkmsg" id="bkMsg"></span>
+  </div>
+  <div id="bkConfirm" hidden></div>
+</section>
+
 <footer>
   App local da obra. Funciona offline, sem internet e sem servidor. Os dados que você digita ficam
-  salvos apenas neste navegador — se limpar os dados do navegador, eles se perdem.
-  Valores em reais de setembro de 2026.
+  salvos apenas neste navegador — use o exportar acima antes de limpar o navegador ou trocar de
+  aparelho. Valores em reais de setembro de 2026.
 </footer>
 
 </div>
@@ -1442,13 +1467,15 @@ function renderGastos(){
     el('th',{},'Data'),el('th',{},'Descrição'),el('th',{class:'n'},'Etapa'),
     el('th',{class:'n'},'Valor'),el('th',{}))));
   const tb=el('tbody');
-  gs.slice().sort((a,b)=>b.d.localeCompare(a.d)).forEach(g=>{
+  // tolerante a registro incompleto: um backup antigo ou um campo faltando não
+  // pode derrubar a tabela inteira
+  gs.slice().sort((a,b)=>String(b.d||'').localeCompare(String(a.d||''))).forEach(g=>{
     const del=el('button',{class:'mini'},'excluir');
     del.addEventListener('click',()=>{save('gastos',store('gastos',[]).filter(x=>x.id!==g.id));renderGastos();});
     tb.appendChild(el('tr',{},
-      el('td',{class:'n'},g.d.split('-').reverse().join('/')),
-      el('td',{},g.t),el('td',{class:'n'},String(g.e)),
-      el('td',{class:'n'},brl(g.v)),el('td',{style:'text-align:right'},del)));
+      el('td',{class:'n'},String(g.d||'—').split('-').reverse().join('/')),
+      el('td',{},String(g.t||'—')),el('td',{class:'n'},g.e==null?'—':String(g.e)),
+      el('td',{class:'n'},brl(+g.v||0)),el('td',{style:'text-align:right'},del)));
   });
   t.appendChild(tb);
   t.appendChild(el('tfoot',{},el('tr',{},
@@ -1470,8 +1497,11 @@ document.getElementById('btnAddGasto').addEventListener('click',()=>{
 
 /* ============ boot ============ */
 
-const cfg=store('cfg',null);
-if(cfg){ inCap.value=cfg.c; inMes.value=cfg.m; inEcon.value=cfg.e; }
+function aplicaCfg(){
+  const cfg=store('cfg',null);
+  if(cfg){ inCap.value=cfg.c; inMes.value=cfg.m; inEcon.value=cfg.e; }
+}
+aplicaCfg();
 
 /* Achados da pesquisa de 04/09/2026. Entram uma única vez; depois é só o Renan
    que mexe. Apagar um aqui na tela não faz ele voltar. */
@@ -1554,13 +1584,106 @@ if(window.Maquete3D){
     'esquadria estão ali para você ver a casa, não para servir de projeto executivo. '+
     'A área gourmet dos fundos aparece só quando ligada, porque ainda não tem orçamento.</p>';
 }
-renderEtapas();
-renderMoney();
-renderAlicerce();
-renderCompras();
-renderAchados();
-renderGastos();
-selectRoom('q1');
+/* Cada tela desenha por conta própria. Se uma quebrar por causa de um registro
+   estranho, as outras — e principalmente o exportar lá embaixo — têm que
+   continuar de pé, senão o Renan fica sem como resgatar os próprios dados. */
+function seguro(nome,fn){ try{ fn(); }catch(e){ console.error('falhou ao desenhar '+nome+':',e); } }
+[['etapas',renderEtapas],['dinheiro',renderMoney],['alicerce',renderAlicerce],
+ ['compras',renderCompras],['achados',renderAchados],['gastos',renderGastos],
+ ['planta',()=>selectRoom('q1')]].forEach(([n,f])=>seguro(n,f));
+
+/* ============ exportar e importar =========================================
+   O app não tem servidor, então os dados vivem no localStorage deste
+   navegador. Estas duas funções são a única ponte entre o computador e o
+   celular — e a única rede de segurança se o navegador for limpo.          */
+
+function redesenharTudo(){
+  // um backup de outra versão do app pode ter registro fora de formato.
+  // Se algo estourar, o app não pode ficar em branco: avisa e segue.
+  try{
+    aplicaCfg();
+    plantaSalva(); drawPlan(); renderAreas(); renderEtapas(); renderMoney();
+    renderAlicerce(); renderCompras(); renderAchados(); renderGastos();
+    selectRoom(SEL||'q1');
+    if(window.Maquete3D) Maquete3D.reconstruir();
+    return true;
+  }catch(e){
+    console.error(e);
+    return false;
+  }
+}
+
+function bkAviso(txt,cls){
+  const m=document.getElementById('bkMsg');
+  m.textContent=txt; m.className='bkmsg'+(cls?' '+cls:'');
+}
+
+function chavesObra(){
+  const ks=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k && k.indexOf('obra.')===0) ks.push(k);
+  }
+  return ks;
+}
+
+document.getElementById('btExport').addEventListener('click',()=>{
+  const pacote={ app:'obra-renan', versao:1, data:new Date().toISOString(), dados:{} };
+  chavesObra().forEach(k=>{ pacote.dados[k]=localStorage.getItem(k); });
+  const n=Object.keys(pacote.dados).length;
+  if(!n){ bkAviso('Não há nada digitado para exportar ainda.','bad'); return; }
+  const blob=new Blob([JSON.stringify(pacote,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='obra-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  bkAviso('Exportado — '+n+' registro'+(n>1?'s':'')+'. Guarde o arquivo.','ok');
+});
+
+document.getElementById('fileImport').addEventListener('change',ev=>{
+  const arq=ev.target.files && ev.target.files[0];
+  ev.target.value='';                    // permite reimportar o mesmo arquivo
+  if(!arq) return;
+  const fr=new FileReader();
+  fr.onerror=()=>bkAviso('Não consegui ler o arquivo.','bad');
+  fr.onload=()=>{
+    let p;
+    try{ p=JSON.parse(fr.result); }
+    catch(e){ bkAviso('Arquivo não é um JSON válido.','bad'); return; }
+    if(!p || p.app!=='obra-renan' || typeof p.dados!=='object' || !p.dados){
+      bkAviso('Isso não é um backup deste app.','bad'); return;
+    }
+    // confirmação na própria página: substituir apaga o que está aqui
+    const cx=document.getElementById('bkConfirm');
+    const quando=(p.data||'').slice(0,10).split('-').reverse().join('/');
+    const chaves=Object.keys(p.dados);
+    cx.hidden=false; cx.textContent='';
+    cx.appendChild(el('p',{style:'margin:0'},
+      'Backup de '+(quando||'data desconhecida')+', com '+chaves.length+' registro'+
+      (chaves.length>1?'s':'')+'. Importar SUBSTITUI o que está neste navegador.'));
+    const ul=el('ul');
+    chaves.slice(0,8).forEach(k=>ul.appendChild(el('li',{},k.replace('obra.',''))));
+    if(chaves.length>8) ul.appendChild(el('li',{},'e mais '+(chaves.length-8)+'…'));
+    cx.appendChild(ul);
+    const ok=el('button',{class:'act',type:'button'},'Substituir e usar este backup');
+    const no=el('button',{class:'act ghost',type:'button',style:'margin-left:8px'},'Cancelar');
+    ok.addEventListener('click',()=>{
+      chavesObra().forEach(k=>localStorage.removeItem(k));
+      chaves.forEach(k=>{ try{ localStorage.setItem(k,p.dados[k]); }catch(e){} });
+      cx.hidden=true;
+      if(redesenharTudo())
+        bkAviso('Importado. Os dados deste backup estão valendo agora.','ok');
+      else
+        bkAviso('Importado, mas algum registro veio fora de formato — recarregue a página '+
+                'e confira. O resto dos dados está salvo.','bad');
+    });
+    no.addEventListener('click',()=>{ cx.hidden=true; bkAviso('Importação cancelada.'); });
+    cx.appendChild(el('div',{},ok,no));
+    bkAviso('Confira abaixo antes de confirmar.');
+  };
+  fr.readAsText(arq);
+});
 </script>
 </body>
 </html>
