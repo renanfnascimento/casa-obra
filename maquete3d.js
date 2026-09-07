@@ -254,11 +254,13 @@ function montaCasa(){
   const bh=amb('banho');
   if(N){
     const vaos=[];
-    if(q1) vaos.push([q1.x+0.40, q1.x+1.30, base, base+H.porta]);
-    if(bh) vaos.push([bh.x+0.20, bh.x+0.90, base, base+H.porta]);
-    if(bh) vaos.push([bh.x+0.25, bh.x+0.85, base+H.basc, base+H.basc+H.bascAlt]);
+    // portas na PONTA de cada parede, do lado da sala — mesma posição do 2D
+    if(q1) vaos.push([q1.x+q1.w-1.05, q1.x+q1.w-0.15, base, base+H.porta]);
+    if(bh) vaos.push([bh.x+bh.w-0.85, bh.x+bh.w-0.15, base, base+H.porta]);
+    // basculante do banheiro vai para a outra ponta, longe da porta
+    if(bh) vaos.push([bh.x+0.20, bh.x+0.80, base+H.basc, base+H.basc+H.bascAlt]);
     parede(g,'x',nz1, L.x0, fx0, base, topo, vaos, mExt, mInt, {etapa:1}, -1);
-    if(bh) esquadria(g,'x',nz1-0.07, bh.x+0.25, bh.x+0.85,
+    if(bh) esquadria(g,'x',nz1-0.07, bh.x+0.20, bh.x+0.80,
       base+H.basc, base+H.basc+H.bascAlt, {etapa:1});
   }
 
@@ -351,7 +353,8 @@ function montaMobilia(){
   if(q1){ // cama de casal com cabeceira na fachada frontal
     bloco(g, q1.x+0.20,q1.y+0.60, q1.x+2.20,q1.y+2.20, base,base+0.55, mat(0xe6e2dc), {etapa:1});
     bloco(g, q1.x+0.20,q1.y+0.60, q1.x+0.32,q1.y+2.20, base,base+1.00, mat(C.madeira), {etapa:1});
-    bloco(g, q1.x+2.35,q1.y+0.30, q1.x+2.85,q1.y+2.60, base,base+2.30, mat(0xe9e5df), {etapa:1});
+    // guarda-roupa na divisa cega: a parede do nicho agora tem a porta na ponta
+    bloco(g, q1.x+0.20,q1.y+2.55, q1.x+2.00,q1.y+2.95, base,base+2.30, mat(0xe9e5df), {etapa:1});
   }
   if(q2){
     bloco(g, q2.x+0.60,q2.y+2.20, q2.x+2.60,q2.y+3.80, base,base+0.55, mat(0xe6e2dc), {etapa:3});
@@ -364,7 +367,8 @@ function montaMobilia(){
     bloco(g, bx,bz, bx+0.95,bz+0.95, base,base+0.03, mat(C.pisoJunta), {etapa:et});
     bloco(g, bx,bz, bx+0.04,bz+0.95, base,base+1.90, mat(C.preto,{transparent:true,opacity:0.75}), {etapa:et});
     bloco(g, bx,bz, bx+0.95,bz+0.04, base,base+1.90, mat(C.preto,{transparent:true,opacity:0.75}), {etapa:et});
-    bloco(g, b.x+0.15,b.y+0.15, b.x+0.65,b.y+0.60, base+0.80,base+0.92, mat(C.bancada), {etapa:et});
+    // pia recuada, para não ficar atrás do giro da porta
+    bloco(g, b.x+0.15,b.y+0.80, b.x+0.65,b.y+1.25, base+0.80,base+0.92, mat(C.bancada), {etapa:et});
   });
 }
 

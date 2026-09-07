@@ -859,11 +859,12 @@ function drawFurniture(){
   const F='var(--furn)',F2='var(--furn2)';
   const r=(x,y,w,h,f)=>root.appendChild(svg('rect',{x:mx(x),y:my(y),width:w*S,height:h*S,fill:f}));
 
-  // quarto 01 — cama com cabeceira na fachada frontal + guarda-roupa na parede do vão
+  // quarto 01 — cama com cabeceira na fachada frontal. O guarda-roupa foi para a
+  // divisa cega: com a porta na ponta da parede do nicho, ele não cabe mais lá.
   r(5.15,4.20,2.00,1.60,F); r(5.15,4.20,0.35,1.60,F2);
-  r(5.15,3.55,2.60,0.45,F2);
-  // banheiro — box e vaso
-  r(8.10,5.30,0.95,0.95,F2); r(8.35,3.55,0.50,0.55,F2);
+  r(5.15,5.95,1.80,0.45,F2);
+  // banheiro — box no fundo e vaso no meio, longe do giro da porta
+  r(8.15,5.40,0.95,0.95,F2); r(8.20,4.45,0.45,0.55,F2);
   // sala — ripado na divisa, sofá, mesa
   r(9.40,6.24,3.00,0.12,'var(--wood)');
   r(9.60,5.33,2.00,0.85,F);
@@ -877,6 +878,8 @@ function drawFurniture(){
   // banheiro da suíte — box no canto dos fundos e vaso
   r(19.10,3.35,0.95,0.95,F2); r(18.85,2.60,0.50,0.55,F2);
 }
+
+const amb2 = id => AMBIENTES.find(a=>a.id===id);
 
 function drawWalls(){
   const line=(x1,y1,x2,y2,st,w)=>root.appendChild(svg('line',
@@ -911,7 +914,11 @@ function drawWalls(){
 
   // AS TRÊS PORTAS QUE ABREM PARA O NICHO. Quarto 01 e banheiro na parede y=3,40;
   // a porta da sala no fundo do nicho, na parede x=9,20.
-  [[5.40,6.30],[8.20,8.90]].forEach(([a,b])=>{
+  // As duas primeiras ficam na PONTA de cada parede, do lado da sala: encostar a
+  // porta no canto libera a parede inteira do quarto para a cama e o guarda-roupa.
+  const q1p=amb2('q1'), bhp=amb2('banho');
+  [ q1p && [q1p.x+q1p.w-1.05, q1p.x+q1p.w-0.15],
+    bhp && [bhp.x+bhp.w-0.85, bhp.x+bhp.w-0.15] ].filter(Boolean).forEach(([a,b])=>{
     line(a,3.40,b,3.40,'var(--planFill)',8);
     root.appendChild(svg('path',{d:`M${mx(a)} ${my(3.40)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(a)} ${my(3.40+(b-a))}`,
       fill:'none',stroke:'var(--ink2)','stroke-width':1.1}));
