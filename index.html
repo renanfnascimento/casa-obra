@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Obra Renan — Aparecida de Goiânia</title>
+<style>
+:root{
+  --paper:#f2f2ef; --surface:#fff; --surface2:#e9e9e4;
+  --ink:#191c1e; --ink2:#4a4f52; --ink3:#7c7d78;
+  --rule:#d3d3cc; --rule2:#bcbcb3;
+  --terra:#a34329; --terraSoft:#e8d3c9;
+  --aco:#3d5a73; --acoSoft:#d6e0e8;
+  --ok:#4d6b3f; --okSoft:#dde6d6;
+  --heroSub:#9ea19a;
+  --planFill:#fff; --planWall:#191c1e; --planOut:#e4e3dd; --furn:#cfc7c0; --furn2:#ded7d1;
+  --wood:#b08968;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",monospace;
+  --sans:"Segoe UI",ui-sans-serif,system-ui,-apple-system,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#131517; --surface:#1b1e21; --surface2:#23272a;
+  --ink:#e8e6e1; --ink2:#b0b3b2; --ink3:#83867f;
+  --rule:#32373a; --rule2:#464c50;
+  --terra:#dc8763; --terraSoft:#4a2b1e;
+  --aco:#8fb4d0; --acoSoft:#23343f;
+  --ok:#9dbb88; --okSoft:#28331f;
+  --heroSub:#5f635f;
+  --planFill:#22262a; --planWall:#e8e6e1; --planOut:#191c1f; --furn:#4a4340; --furn2:#383331;
+  --wood:#7a5c42;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+header{border-bottom:2px solid var(--ink);padding:28px 0 16px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}
+header h1{margin:0;font-size:26px;letter-spacing:-.02em}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);margin:0 0 4px}
+
+nav{display:flex;gap:2px;flex-wrap:wrap;margin:18px 0 24px;background:var(--rule);padding:2px;border:1px solid var(--rule)}
+nav button{flex:1;min-width:96px;border:0;background:var(--paper);color:var(--ink2);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 8px;cursor:pointer}
+nav button:hover{background:var(--surface2);color:var(--ink)}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+nav button:focus-visible{outline:2px solid var(--terra);outline-offset:-2px}
+
+.panel[hidden]{display:none}
+h2{font-size:19px;margin:0 0 4px;letter-spacing:-.015em}
+.sub{color:var(--ink2);margin:0 0 20px;max-width:70ch}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--rule2);border:1px solid var(--rule2);margin-bottom:24px}
+.card{background:var(--surface);padding:14px 16px 16px}
+.card.hi{background:var(--ink);color:var(--paper)}
+.card.hi .k,.card.hi .v small{color:var(--heroSub)}
+.k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:0 0 5px}
+.v{font-size:23px;font-weight:700;letter-spacing:-.025em;font-variant-numeric:tabular-nums;margin:0;line-height:1.15}
+.v small{font-size:13px;font-weight:600;color:var(--ink3)}
+
+.planbox{background:var(--surface);border:1px solid var(--rule2);overflow-x:auto;padding:4px}
+.planbox svg{display:block;min-width:1020px;width:100%;height:auto;font-family:var(--sans)}
+.planbox svg .mono{font-family:var(--mono)}
+.room{cursor:pointer}
+.room .rfill{fill:var(--planFill);fill-opacity:.001;transition:fill-opacity .12s}
+.room:hover .rfill{fill:var(--acoSoft);fill-opacity:1}
+.room.sel .rfill{fill:var(--terraSoft);fill-opacity:1}
+.room:focus-visible{outline:none}
+.room:focus-visible .rfill{fill:var(--acoSoft);fill-opacity:1}
+
+/* modo edição da planta */
+.planbox.editing .room{cursor:move}
+.planbox.editing .room .rfill{fill:var(--acoSoft);fill-opacity:.55}
+.planbox.editing .room.sel .rfill{fill:var(--terraSoft);fill-opacity:1}
+.rhandle{fill:var(--paper);stroke:var(--terra);stroke-width:1.6;cursor:nwse-resize}
+.rhandle:hover{fill:var(--terra)}
+.editbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.editbar .hint{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink3)}
+.editpanel{background:var(--surface);border:1px solid var(--rule2);padding:14px 16px;margin-top:12px}
+.editpanel .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.editpanel .field input{width:92px}
+.editpanel h4{margin:0 0 10px;font-size:14px}
+.fit{font-family:var(--mono);font-size:11.5px;margin-top:12px;padding-top:10px;border-top:1px solid var(--rule2);line-height:1.7}
+.fit b{font-weight:700}
+.fit .ok{color:var(--ok)} .fit .bad{color:var(--terra)}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:16px;height:9px;border:1px solid var(--rule2)}
+
+#roomInfo{margin-top:16px;border-left:3px solid var(--terra);background:var(--surface);padding:12px 16px;min-height:64px}
+#roomInfo h3{margin:0 0 2px;font-size:15px}
+#roomInfo p{margin:0;color:var(--ink2);font-size:14px}
+
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:540px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:baseline}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);border-bottom:1.5px solid var(--ink);white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tfoot td{border-top:1.5px solid var(--ink);border-bottom:0;font-weight:700;padding-top:11px}
+tbody tr:hover{background:var(--surface2)}
+
+.tag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--rule2);color:var(--ink2);white-space:nowrap}
+.tag.novo{border-color:var(--terra);color:var(--terra);background:var(--terraSoft)}
+.tag.usado{border-color:var(--ok);color:var(--ok);background:var(--okSoft)}
+
+.ctrl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;background:var(--surface);border:1px solid var(--rule2);padding:14px 16px;margin-bottom:22px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+input[type=number],input[type=text],input[type=date],select{font-family:var(--mono);font-size:14px;padding:7px 9px;border:1px solid var(--rule2);background:var(--paper);color:var(--ink);min-width:110px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--terra);outline-offset:1px}
+button.act{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 14px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+button.act:hover{opacity:.85}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule2)}
+button.mini{font-family:var(--mono);font-size:10px;padding:3px 7px;border:1px solid var(--rule2);background:transparent;color:var(--ink3);cursor:pointer}
+button.mini:hover{color:var(--terra);border-color:var(--terra)}
+
+.gantt{height:9px;background:var(--surface2)}
+.gantt i{display:block;height:9px}
+
+ul.chk{list-style:none;padding:0;margin:0}
+ul.chk li{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--rule)}
+ul.chk input{margin-top:4px;width:16px;height:16px;accent-color:var(--terra);flex:none}
+ul.chk .txt{flex:1}
+ul.chk li.done .txt{opacity:.5;text-decoration:line-through}
+.grouphead{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--terra);margin:26px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:5px}
+
+.note{border-left:3px solid var(--terra);background:var(--surface);padding:13px 16px;margin:20px 0}
+.note b{color:var(--terra)}
+
+/* ---- aba 3D ---- */
+.viewbox{position:relative;background:#c9d3da;border:1px solid var(--rule2);overflow:hidden;
+  height:min(70vh,620px);touch-action:none;cursor:grab}
+.viewbox.dragging{cursor:grabbing}
+.viewbox canvas{display:block;width:100%;height:100%}
+.viewbox .load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--surface);text-align:center;padding:24px}
+.v3bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.v3bar .grp{display:flex;gap:0;border:1px solid var(--rule2)}
+.v3bar .grp button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 11px;border:0;border-right:1px solid var(--rule2);background:var(--surface);color:var(--ink2);cursor:pointer}
+.v3bar .grp button:last-child{border-right:0}
+.v3bar .grp button:hover{background:var(--surface2);color:var(--ink)}
+.v3bar .grp button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.v3hint{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin:10px 0 0}
+.v3leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+.v3leg span{display:inline-flex;align-items:center;gap:6px}
+.v3leg i{width:16px;height:9px;border:1px solid var(--rule2);display:inline-block}
+.empty{color:var(--ink3);font-style:italic;padding:16px 0;text-align:left}
+footer{margin-top:56px;border-top:1px solid var(--rule);padding-top:16px;font-size:12.5px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div style="flex:1;min-width:220px">
+    <p class="eyebrow">Aparecida de Goiânia — GO · autoconstrução</p>
+    <h1>Obra da casa — painel de controle</h1>
+  </div>
+  <div style="font-family:var(--mono);font-size:12px;color:var(--ink3);text-align:right">
+    Lote 6,40 × 29,00 m<br>Casa 4,00 × 15,20 · 56,60 m² construídos
+  </div>
+</header>
+
+<nav role="tablist">
+  <button role="tab" data-tab="planta" aria-selected="true">Planta</button>
+  <button role="tab" data-tab="tresd" aria-selected="false">3D</button>
+  <button role="tab" data-tab="etapas" aria-selected="false">Etapas</button>
+  <button role="tab" data-tab="alicerce" aria-selected="false">Alicerce</button>
+  <button role="tab" data-tab="dinheiro" aria-selected="false">Dinheiro</button>
+  <button role="tab" data-tab="compras" aria-selected="false">Compras</button>
+  <button role="tab" data-tab="achados" aria-selected="false">Achados</button>
+  <button role="tab" data-tab="gastos" aria-selected="false">Gastos</button>
+</nav>
+
+<section class="panel" id="tab-planta">
+  <h2>Planta baixa</h2>
+  <p class="sub">Desenhada a partir do esboço à mão. Rua à esquerda, quintal à direita. O corredor de 2,40 m fica em cima — quem entra pela rua o tem à sua esquerda; a divisa cega, embaixo. A casa tem 4,00 m de largura: o quarto e o banheiro ocupam 3,00 encostados na divisa, e o "vãozinho" de 1,00 m do lado do corredor é por onde se entra. Clique em qualquer ambiente.</p>
+
+  <div class="editbar">
+    <button class="act" id="btEdit" type="button">Editar planta</button>
+    <button class="act ghost" id="btReset" type="button" hidden>Voltar ao original</button>
+    <span class="hint" id="editHint">Clique em qualquer ambiente para ver os detalhes.</span>
+  </div>
+
+  <div class="planbox" id="planbox">
+    <svg viewBox="0 0 1300 470" id="plan" role="img" aria-label="Planta baixa da casa de 60,80 m²">
+      <defs>
+        <marker id="tk" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <line x1="4" y1="1" x2="4" y2="7" stroke="#3d5a73" stroke-width="1.4"/>
+        </marker>
+      </defs>
+      <g id="planRoot"></g>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--planFill)"></i> Área construída</span>
+    <span><i class="sw" style="background:var(--planOut)"></i> Área descoberta</span>
+    <span><i class="sw" style="background:var(--furn)"></i> Mobiliário e bancada</span>
+    <span><i class="sw" style="background:var(--terra);border-color:var(--terra)"></i> Divisa cega — sem aberturas</span>
+    <span><i class="sw" style="background:var(--acoSoft);border-color:var(--aco)"></i> Janela</span>
+  </div>
+
+  <div id="roomInfo"></div>
+  <div class="editpanel" id="editPanel" hidden></div>
+
+  <h2 style="margin-top:34px">Quadro de áreas</h2>
+  <div class="tablewrap"><table id="areasTable"></table></div>
+</section>
+
+<section class="panel" id="tab-tresd" hidden>
+  <h2>Maquete 3D</h2>
+  <p class="sub">A planta da aba ao lado, levantada em três dimensões com a arquitetura da casa de referência do vídeo: grafiato cinza escuro por fora, laje plana com platibanda, esquadria preta, porcelanato bege, ripado de madeira na sala e corredor de pedrisco com placas de concreto. Mexeu na planta, muda aqui.</p>
+
+  <div class="v3bar">
+    <span class="grp">
+      <button type="button" data-cam="frente">Frente</button>
+      <button type="button" data-cam="rua">Da rua</button>
+      <button type="button" data-cam="corredor">Corredor</button>
+      <button type="button" data-cam="fundos">Fundos</button>
+      <button type="button" data-cam="topo">Topo</button>
+      <button type="button" data-cam="olho">Ao nível do olho</button>
+    </span>
+    <span class="grp">
+      <button type="button" data-tog="teto" aria-pressed="false">Cobertura</button>
+      <button type="button" data-tog="mob" aria-pressed="true">Mobiliário</button>
+      <button type="button" data-tog="muro" aria-pressed="true">Muros</button>
+      <button type="button" data-tog="futuro" aria-pressed="false">Área gourmet futura</button>
+    </span>
+    <span class="grp" id="v3etapas">
+      <button type="button" data-et="1" aria-pressed="true">Etapa 1</button>
+      <button type="button" data-et="2" aria-pressed="true">2</button>
+      <button type="button" data-et="3" aria-pressed="true">3</button>
+      <button type="button" data-et="4" aria-pressed="true">4</button>
+    </span>
+  </div>
+
+  <div class="viewbox" id="viewbox"><div class="load" id="v3load">Carregando a maquete…</div></div>
+
+  <p class="v3hint">Arraste para girar · dois dedos ou botão direito para deslocar · roda do mouse para aproximar. A cobertura começa desligada para dar de ver a planta por dentro; ligue em <b>Cobertura</b> para ver a casa fechada como ela vai ficar da rua.</p>
+
+  <div class="v3leg">
+    <span><i style="background:#4a4d50"></i> Grafiato cinza escuro — fachada</span>
+    <span><i style="background:#f4f2ee"></i> Parede interna branca</span>
+    <span><i style="background:#d9cfc0"></i> Porcelanato bege</span>
+    <span><i style="background:#8a5a33"></i> Ripado de madeira</span>
+    <span><i style="background:#1b1c1e"></i> Esquadria preta e granito</span>
+    <span><i style="background:#6f6f6b"></i> Pedrisco do corredor</span>
+  </div>
+
+  <div id="v3info" class="note" style="margin-top:18px"></div>
+</section>
+
+<section class="panel" id="tab-etapas" hidden>
+  <h2>Etapas da obra</h2>
+  <p class="sub">A obra começa pelo bloco da frente, porque é ele que tem o banheiro — o que torna o primeiro módulo habitável. Depois cresce em direção ao fundo do lote.</p>
+  <div class="tablewrap"><table id="etapasTable"></table></div>
+  <div class="note">
+    <p style="margin:0"><b>Regra de ouro.</b> Fundação, estrutura e cobertura não se economizam. Acabamento sim — piso, pintura, louças e esquadrias podem esperar ou vir de segunda mão sem prejuízo nenhum para a casa.</p>
+  </div>
+</section>
+
+<section class="panel" id="tab-dinheiro" hidden>
+  <h2>Simulador de aporte</h2>
+  <p class="sub">Mexa nos valores para ver quando cada etapa fecha. O aporte mensal é a variável que mais encurta o prazo — mais do que qualquer economia em material.</p>
+
+  <div class="ctrl">
+    <div class="field"><label for="inCap">Capital hoje (R$)</label><input type="number" id="inCap" value="6000" min="0" step="500"></div>
+    <div class="field"><label for="inMes">Aporte mensal (R$)</label><input type="number" id="inMes" value="1000" min="0" step="100"></div>
+    <div class="field"><label for="inEcon">Desconto por compra usada</label>
+      <select id="inEcon">
+        <option value="0">Nenhum — tudo novo</option>
+        <option value="0.15" selected>15% — usado no acabamento</option>
+        <option value="0.25">25% — caça agressiva em OLX e Facebook</option>
+      </select>
+    </div>
+    <button class="act ghost" id="btnReset">Restaurar padrão</button>
+  </div>
+
+  <div class="cards" id="moneyCards"></div>
+  <div class="tablewrap"><table id="prazoTable"></table></div>
+  <div class="note" id="verdict"></div>
+</section>
+
+<section class="panel" id="tab-alicerce" hidden>
+  <h2>Alicerce</h2>
+  <p class="sub">Sapata corrida com viga baldrame — fundação rasa. As quantidades saem da planta; os preços vieram de pesquisa na web em 04/09/2026. Cada linha diz de onde veio o número, e o que não foi encontrado fica marcado e <b>não</b> entra no total.</p>
+
+  <div class="cards" id="aliCards"></div>
+  <div class="note" id="aliTrava"></div>
+
+  <h3 class="grouphead">Quantidades tiradas da planta</h3>
+  <div class="tablewrap"><table id="aliQtd"></table></div>
+
+  <h3 class="grouphead">Preços pesquisados — 04/09/2026</h3>
+  <div class="tablewrap"><table id="aliPreco"></table></div>
+  <p class="sub" id="aliFalta" style="margin-top:12px"></p>
+
+  <h3 class="grouphead">A decisão da betoneira</h3>
+  <p class="sub" style="margin-bottom:12px">O app trazia meta de comprar usada por R$ 200 líquidos. A pesquisa derrubou isso — estes são os anúncios reais na Grande Goiânia em 04/09.</p>
+  <div class="tablewrap"><table id="aliBet"></table></div>
+  <div class="note" id="aliBetNota"></div>
+
+  <h3 class="grouphead">A sondagem SPT</h3>
+  <div class="note" id="aliSpt"></div>
+
+  <h3 class="grouphead">A ordem que o dinheiro impõe</h3>
+  <div id="aliOrdem"></div>
+</section>
+
+<section class="panel" id="tab-compras" hidden>
+  <h2>Lista de compras</h2>
+  <p class="sub">O que segura a casa em pé se compra novo e com nota. O que é acabamento se caça barato. Marque o que já foi comprado — fica salvo neste computador.</p>
+  <div class="ctrl" style="gap:10px">
+    <span style="font-family:var(--mono);font-size:11px;color:var(--ink3)" id="chkCount"></span>
+    <button class="act ghost mini" id="btnClearChk" style="margin-left:auto">Desmarcar tudo</button>
+  </div>
+  <div id="comprasList"></div>
+</section>
+
+<section class="panel" id="tab-achados" hidden>
+  <h2>Caça ao material barato</h2>
+  <p class="sub">Nada aqui se compra pelo preço de tabela. Estes são os itens que valem a caça em demolição, grupos do Facebook e OLX — com a meta de preço e quanto cada um economiza em meses de aporte.</p>
+
+  <div class="cards" id="cacaCards"></div>
+
+  <h3 class="grouphead" style="margin-top:0">Alvos de caça</h3>
+  <p class="sub" style="margin-bottom:12px">Clique no status para avançar: a procurar → achei → negociando → comprado.</p>
+  <div class="tablewrap"><table id="alvosTable"></table></div>
+
+  <h3 class="grouphead">Achados registrados</h3>
+  <p class="sub" style="margin-bottom:12px">Toda oportunidade encontrada entra aqui — com link e telefone, para não se perder e virar histórico de preço.</p>
+
+  <div class="ctrl">
+    <div class="field"><label for="aItem">Item</label><select id="aItem"></select></div>
+    <div class="field"><label for="aPreco">Preço pedido (R$)</label><input type="number" id="aPreco" min="0" step="1"></div>
+    <div class="field" style="flex:1;min-width:160px"><label for="aFonte">Onde / quem</label><input type="text" id="aFonte" placeholder="Formigão Demolição · (62) 3280-4115" style="width:100%"></div>
+    <div class="field" style="flex:1;min-width:160px"><label for="aLink">Link ou contato</label><input type="text" id="aLink" placeholder="olx.com.br/..." style="width:100%"></div>
+    <button class="act" id="btnAddAchado">Registrar</button>
+  </div>
+
+  <div class="tablewrap"><table id="achadosTable"></table></div>
+
+  <h3 class="grouphead">Onde procurar</h3>
+  <div id="fontesList"></div>
+
+  <div class="note">
+    <p style="margin:0 0 8px"><b>O que nunca entra nessa caça.</b> Cimento, aço, bloco, fiação elétrica, tubulação de gás e impermeabilizante se compram novos, com nota. É o que segura a casa em pé — economizar aí não é economia, é risco.</p>
+    <p style="margin:0"><b>Como negociar em demolição.</b> Vá com a medida do vão anotada e leve trena. Peça preço para o lote fechado, não peça a peça. Pagamento à vista em dinheiro costuma abrir 20% a 30%. Combine o frete antes — ele some com a economia se você descuidar.</p>
+  </div>
+</section>
+
+<section class="panel" id="tab-gastos" hidden>
+  <h2>Controle de gastos</h2>
+  <p class="sub">Anote cada compra. Os dados ficam salvos neste navegador, neste computador.</p>
+  <div class="ctrl">
+    <div class="field"><label for="gData">Data</label><input type="date" id="gData"></div>
+    <div class="field" style="flex:1;min-width:180px"><label for="gDesc">O que foi comprado</label><input type="text" id="gDesc" placeholder="20 sacos de cimento" style="width:100%"></div>
+    <div class="field"><label for="gEtapa">Etapa</label><select id="gEtapa"></select></div>
+    <div class="field"><label for="gValor">Valor (R$)</label><input type="number" id="gValor" min="0" step="0.01"></div>
+    <button class="act" id="btnAddGasto">Lançar</button>
+  </div>
+  <div class="cards" id="gastoCards"></div>
+  <div class="tablewrap"><table id="gastosTable"></table></div>
+</section>
+
+<footer>
+  App local da obra. Funciona offline, sem internet e sem servidor. Os dados que você digita ficam
+  salvos apenas neste navegador — se limpar os dados do navegador, eles se perdem.
+  Valores em reais de setembro de 2026.
+</footer>
+
+</div>
+
+<script src="three.min.js"></script>
+<script src="maquete3d.js"></script>
+<script>
+"use strict";
+
+/* ============ dados do projeto ============ */
+
+const S = 40, X0 = 60, Y0 = 120;
+const mx = m => X0 + m * S;
+const my = m => Y0 + m * S;
+
+// O LOTE é o único dado que não se discute: é o que está na escritura.
+const LOTE_C = 29.00, LOTE_L = 6.40;
+// O contorno da casa é editável. Corredor e quintal NÃO se digitam — eles são
+// o que sobra do lote depois da casa, e recalculam sozinhos.
+let RECUO = 5.00, CASA_L = 15.20, CASA_W = 4.00, CORR = 2.40, QUINTAL = 8.80;
+
+function recalcEnvelope(){
+  CORR    = +(LOTE_L - CASA_W).toFixed(2);
+  QUINTAL = +(LOTE_C - RECUO - CASA_L).toFixed(2);
+  const g=EXTERNOS.find(e=>e.id==='garagem'), c=EXTERNOS.find(e=>e.id==='corr'),
+        q=EXTERNOS.find(e=>e.id==='quintal');
+  if(g){ g.w=RECUO;   g.h=LOTE_L; g.area=+(RECUO*LOTE_L).toFixed(2); }
+  if(c){ c.x=RECUO;   c.w=CASA_L; c.h=CORR;  c.area=+(CASA_L*CORR).toFixed(2); }
+  if(q){ q.x=RECUO+CASA_L; q.w=QUINTAL; q.h=LOTE_L; q.area=+(QUINTAL*LOTE_L).toFixed(2); }
+}
+
+// x = distância da testada (rua), crescendo para o fundo do lote.
+// y = distância da divisa DO LADO DO CORREDOR, crescendo para baixo na tela.
+// Logo o corredor de 2,40 m ocupa y 0,00–2,40 e desenha na faixa de CIMA;
+// a casa ocupa y 2,40–6,40 e encosta na divisa cega, que fica embaixo.
+// Esse é o lado ESQUERDO de quem entra pela rua (e o direito de quem olha
+// do fundo do lote) — conferir contra a seção 5 do CLAUDE.md antes de mexer.
+// Desenhado a partir do esboço à mão do Renan (foto de 07/09/2026). O esboço põe
+// o quarto 01 e o banheiro ENCOSTADOS NA DIVISA CEGA e o hall de 1,00 m correndo
+// pelo lado do corredor — o inverso da versão anterior. Ver seção 5 do CLAUDE.md.
+const AMBIENTES = [
+  { id:'nicho', nome:'Nicho de entrada', x:5.00, y:2.40, w:4.20, h:1.00,
+    etapa:1, aberto:true,
+    obs:'A faixa de 1,00 m que sobra dos 4,00 de largura depois dos 3,00 do quarto, correndo os 4,20 m INTEIROS do bloco da frente — 3,00 ao lado do quarto e 1,20 ao lado do banheiro. É ABERTA: sem parede na frente e sem parede para o corredor, recuada para dentro do contorno. Funciona como um mini corredor coberto pelo beiral: as portas do quarto 01 e do banheiro abrem para cá, e no fundo dela fica a porta da sala. NÃO É ÁREA CONSTRUÍDA.' },
+  { id:'q1', nome:'Quarto 01', x:5.00, y:3.40, w:3.00, h:3.00, etapa:1,
+    obs:'Os 3,00 × 3,00 escritos no esboço, encostado na divisa cega. Cama de casal com cabeceira na fachada frontal e guarda-roupa na parede do nicho. Janela na fachada frontal, dando para a garagem. Porta abrindo para o nicho, que é coberto.' },
+  { id:'banho', nome:'Banheiro', x:8.00, y:3.40, w:1.20, h:3.00, etapa:1,
+    obs:'3,00 de largura × 1,20 de profundidade, como no esboço, encostado na divisa cega. Box de vidro e nicho embutido. Porta abrindo para o nicho. Como o nicho é aberto, a parede do banheiro virou FACHADA: dá para pôr basculante acima da porta e o banheiro ventila de verdade. Acabou a necessidade de exaustor mecânico.' },
+  { id:'sala', nome:'Sala + cozinha integradas', x:9.20, y:2.40, w:6.00, h:4.00, etapa:2,
+    obs:'Os 4 × 6 do esboço. Painel ripado de madeira com a TV na divisa cega, bancada em L da cozinha também na divisa, e península voltada para a sala. Porta de saída lateral e duas janelas para o corredor.' },
+  // `minus` faz a área da suíte descontar o banheiro sozinha — precisa ser dinâmico
+  // porque no modo de edição o Renan mexe nas duas caixas.
+  { id:'q2', nome:'Quarto 02 — suíte', x:15.20, y:2.40, w:5.00, h:4.00, minus:'banhosuite',
+    lx:17.70, ly:5.20, etapa:3,
+    obs:'O esboço marca 5 × 4 e escreve SUÍTE: o quarto perde o canto dos fundos para o banheiro próprio e fica com 17,00 m². Cabeceira na divisa cega, janela para o corredor e porta para o quintal.' },
+  { id:'banhosuite', nome:'Banheiro da suíte', short:'BANHO', x:18.70, y:2.40, w:1.50, h:2.00,
+    etapa:3, small:true,
+    obs:'O boxinho desenhado no canto dos fundos da suíte. 1,50 × 2,00 = 3,00 m², no canto do corredor com os fundos — a única posição em que ele tem janela de verdade. É o segundo banheiro da casa, como na casa de referência.' }
+];
+
+const EXTERNOS = [
+  { id:'garagem', nome:'Garagem — 2 vagas', x:0.00, y:0.00, w:5.00, h:6.40, area:32.00, etapa:4,
+    obs:'Recuo frontal de 5,00 m, descoberto, com portão metálico escuro.' },
+  { id:'corr', nome:'Corredor lateral', x:5.00, y:0.00, w:15.20, h:2.40, area:36.48, etapa:4,
+    obs:'2,40 m de largura, com pedrisco e pisos de passagem. Fica à esquerda de quem entra pela rua. Quase toda a luz da casa entra por aqui — as exceções são o quarto 01, que tem janela na fachada frontal, e o banheiro, que não tem parede externa nenhuma.' },
+  { id:'quintal', nome:'Quintal', x:20.20, y:0.00, w:8.80, h:6.40, area:56.32, etapa:4,
+    obs:'8,80 m de fundo, com grama e muro alto. Sobra espaço de folga para uma área gourmet mais adiante, quando houver dinheiro.' }
+];
+
+const ETAPAS = [
+  { n:0, nome:'Documentação e projeto', area:0, mat:500, tec:8500,
+    desc:'Projeto arquitetônico e estrutural, ART/RRT, alvará, sondagem de solo, limpeza e locação do terreno.' },
+  { n:1, nome:'Bloco frontal', area:12.60, mat:24000, tec:5000,
+    desc:'Quarto 01 e banheiro — 12,60 m² fechados, mais o nicho de entrada, que é aberto. Ao terminar já dá para morar, com cozinha provisória. É o primeiro módulo com banheiro, por isso vem primeiro. Orçar o beiral que cobre o nicho.' },
+  { n:2, nome:'Sala e cozinha integradas', area:24.00, mat:25000, tec:3500,
+    desc:'Os 6,00 m de sala e cozinha, com a bancada em L e o painel ripado. A casa vira uma casa de verdade.' },
+  { n:3, nome:'Quarto 02 — suíte', area:20.00, mat:16000, tec:2500,
+    desc:'Os 4,00 × 5,00 do fundo, agora com banheiro próprio de 3,00 m² — o esboço escreve SUÍTE. Casa completa, 2 quartos e 2 banheiros. ATENÇÃO: os R$ 16.000 de material são da versão sem o segundo banheiro. Falta orçar louças, metais, box, revestimento e tubulação dele.' },
+  { n:4, nome:'Acabamentos e fechamento', area:0, mat:12000, tec:2000,
+    desc:'Pintura, forro, muro, portão, garagem, calçada e ligações definitivas de água e energia.' }
+];
+
+const COMPRAS = [
+  { grupo:'Nunca comprar usado — a estrutura da casa', itens:[
+    { t:'Cimento CP II-32', d:'Só o do mês. Validade de 3 meses. Guardar sobre estrado, longe da parede, no máximo 10 sacos empilhados.', tag:'novo' },
+    { t:'Aço CA-50 e CA-60', d:'Sem corrosão profunda e com procedência. Ferro enferrujado por dentro não segura laje.', tag:'novo' },
+    { t:'Blocos cerâmicos ou de concreto', d:'Rejeitar lote com blocos rachados ou fora de esquadro.', tag:'novo' },
+    { t:'Fiação elétrica', d:'Exigir selo INMETRO. Fio sem certificação é risco de incêndio.', tag:'novo' },
+    { t:'Tubulação de gás', d:'Nunca usada, nunca improvisada.', tag:'novo' },
+    { t:'Impermeabilizante', d:'Conferir a validade na embalagem.', tag:'novo' }
+  ]},
+  { grupo:'Caçar barato — OLX, Facebook e demolição', itens:[
+    { t:'Portas e batentes', d:'Madeira maciça de demolição costuma ser melhor que a porta nova barata. Medir o vão antes.', tag:'usado' },
+    { t:'Janelas e esquadrias', d:'São 5 janelas no total, todas na fachada esquerda. Conferir se o vidro está inteiro e se corre bem.', tag:'usado' },
+    { t:'Telhas', d:'Comprar 10% a mais para repor as quebradas no transporte.', tag:'usado' },
+    { t:'Madeira para forma', d:'Reaproveitável de outras obras. Some muito se comprada nova.', tag:'usado' },
+    { t:'Betoneira e andaime', d:'Comprar usado e revender no fim da obra — sai quase de graça.', tag:'usado' },
+    { t:'Louças e metais', d:'Vaso, cuba, torneira, chuveiro e box. Mercado de usados farto e barato.', tag:'usado' },
+    { t:'Piso e revestimento', d:'Sobra de obra sai por um terço do preço. Garantir o metro quadrado inteiro do cômodo no mesmo lote.', tag:'usado' },
+    { t:'Bancada de granito', d:'Marmoraria vende retalho e sobra por muito menos que a peça nova. Serve para a bancada em L da cozinha.', tag:'usado' },
+    { t:'Ripado de madeira da sala', d:'Dá para fazer com sarrafo comum e verniz, ou achar painel pronto de sobra de obra.', tag:'usado' },
+    { t:'Portão e caixa d’água', d:'Itens caros novos, abundantes usados.', tag:'usado' }
+  ]},
+  { grupo:'Serviços que precisam ser contratados', itens:[
+    { t:'Projeto arquitetônico e aprovação', d:'Sem isso não há alvará, e sem alvará não há habite-se nem financiamento depois.', tag:'novo' },
+    { t:'Projeto estrutural e ART', d:'Fundação e laje dimensionadas por engenheiro. É o item que não admite improviso.', tag:'novo' },
+    { t:'Sondagem de solo SPT', d:'R$ 1.800 e é o único item com risco alto de estourar. Se o solo for mole, a fundação dobra de preço. Faça antes de tudo.', tag:'novo' },
+    { t:'Padrão de entrada de energia', d:'Eletricista credenciado com ART, exigência da Equatorial Goiás.', tag:'novo' },
+    { t:'Concretagem da laje', d:'Precisa de várias mãos no mesmo dia. Equipe de diária ou mutirão.', tag:'novo' },
+    { t:'Ajuda de pedreiro em etapas críticas', d:'Fundação, primeira fiada e laje. O resto dá para tocar sozinho.', tag:'novo' }
+  ]}
+];
+
+// Itens que valem a caça. `novo` é o preço de comprar zero; `meta` é o alvo em usado
+// ou demolição. Quantidades tiradas da planta de 60,80 m².
+const ALVOS = [
+  { id:'jan', item:'Janelas de correr', qtd:'5 un', novo:4750, meta:1250, etapa:2,
+    onde:'Demolição e grupos do Facebook. Medir os vãos antes de sair de casa.' },
+  { id:'pent', item:'Porta de entrada 1,00 m', qtd:'1 un', novo:1800, meta:500, etapa:1,
+    onde:'Demolição. Porta maciça de demolição costuma ser melhor que a nova barata.' },
+  { id:'pint', item:'Portas internas com batente', qtd:'3 un', novo:1860, meta:600, etapa:1,
+    onde:'Demolição e desapego. Conferir se o batente vem junto.' },
+  { id:'telha', item:'Telhas', qtd:'76 m²', novo:2660, meta:1140, etapa:1,
+    onde:'Demolição. Comprar 10% a mais — sempre quebra no transporte.' },
+  { id:'piso', item:'Piso e revestimento', qtd:'61 m²', novo:3355, meta:1220, etapa:3,
+    onde:'Sobra de obra no OLX. Garantir o cômodo inteiro no mesmo lote e mesma tonalidade.' },
+  { id:'granito', item:'Bancada de granito', qtd:'~3,5 m', novo:2200, meta:700, etapa:2,
+    onde:'Retalho e sobra de marmoraria. Serve para a bancada em L da cozinha.' },
+  { id:'loucas', item:'Louças, metais e box', qtd:'1 banheiro', novo:3500, meta:1200, etapa:1,
+    onde:'Desapego e demolição. Vaso, cuba, torneiras, chuveiro e box de vidro.' },
+  { id:'portao', item:'Portão de garagem', qtd:'1 un', novo:3200, meta:900, etapa:4,
+    onde:'Serralheria de demolição. Medir a testada de 6,40 m antes.' },
+  { id:'caixa', item:'Caixa d’água 1000 L', qtd:'1 un', novo:700, meta:250, etapa:2,
+    onde:'OLX e desapego. Conferir se não tem trinca e lavar bem antes de usar.' },
+  { id:'forma', item:'Madeira para forma', qtd:'lote', novo:1800, meta:200, etapa:1,
+    onde:'Pesquisa 04/09: lote a R$ 200 no OLX e doação de madeira em Goiânia. Obra vizinha terminando também dá de graça.' },
+  { id:'betoneira', item:'Betoneira 400 L', qtd:'1 un', novo:3200, meta:198, etapa:1,
+    onde:'ALUGAR. Pesquisa 04/09: aluguel R$ 198; usada em Grande Goiânia custa R$ 2.600 a R$ 4.300 — comprar não se paga em 7 m³.' },
+  { id:'andaime', item:'Andaime — 4 torres', qtd:'4 un', novo:2400, meta:200, etapa:1,
+    onde:'Mesma lógica da betoneira: compra usado, revende no fim da obra.' },
+  { id:'ripado', item:'Ripado de madeira da sala', qtd:'3,00 m', novo:1200, meta:350, etapa:3,
+    onde:'Dá para fazer com sarrafo comum e verniz. Painel pronto de sobra também serve.' }
+];
+
+const FONTES = [
+  { tipo:'Demolição', nome:'Demolição e Serralheria Rio Verde', local:'Aparecida de Goiânia',
+    detalhe:'Compra e vende portas, portões, telhas e janelas — novo e usado. (62) 3280-4115',
+    url:'https://www.facebook.com/p/Demoli%C3%A7%C3%A3o-E-Serralheria-Rio-Verde-100072248209203/' },
+  { tipo:'Demolição', nome:'Formigão Demolição', local:'Aparecida de Goiânia',
+    detalhe:'Material de construção e estrutura metálica, novo e usado.',
+    url:'https://www.facebook.com/demolicaoformigao/' },
+  { tipo:'Demolição', nome:'Shopping da Demolição', local:'Aparecida de Goiânia',
+    detalhe:'Depósito de material de demolição e reciclagem.',
+    url:'https://www.facebook.com/Shoppingdareciclagem/' },
+  { tipo:'Facebook', nome:'DESAPEGOS! Materiais de construção', local:'Goiânia',
+    detalhe:'Grupo de compra e venda. É onde aparece sobra de obra barata.',
+    url:'https://www.facebook.com/groups/709018679208728/' },
+  { tipo:'Facebook', nome:'Venda e troca de material de construção e mão de obra', local:'Goiânia',
+    detalhe:'Tem material e também mão de obra avulsa para as etapas pontuais.',
+    url:'https://www.facebook.com/groups/906073569489590/' },
+  { tipo:'Facebook', nome:'Venda, Troca e/ou Doação de Material de Construção', local:'Goiás',
+    detalhe:'O “doação” do nome é literal — aparece material de graça para quem retira.',
+    url:'https://www.facebook.com/groups/2003266323243015/' },
+  { tipo:'OLX', nome:'Materiais de construção em Aparecida de Goiânia', local:'Aparecida',
+    detalhe:'Busca já filtrada na cidade — o frete curto preserva a economia.',
+    url:'https://www.olx.com.br/materiais-de-construcao/estado-go/grande-goiania-e-anapolis/grande-goiania/aparecida-de-goiania' },
+  { tipo:'OLX', nome:'Portas e janelas na Grande Goiânia', local:'Grande Goiânia',
+    detalhe:'Categoria específica — é onde estão as 5 janelas e as 4 portas da obra.',
+    url:'https://www.olx.com.br/materiais-de-construcao/portas-e-janelas/estado-go/grande-goiania-e-anapolis/grande-goiania' },
+  { tipo:'OLX', nome:'Busca “resto de material de obra”', local:'Brasil',
+    detalhe:'Termo que garimpa sobra de obra que ninguém anunciou direito.',
+    url:'https://www.olx.com.br/anuncios/resto-de-material-de-obra' },
+  { tipo:'OLX', nome:'Betoneiras na Grande Goiânia', local:'Grande Goiânia',
+    detalhe:'76 anúncios em 04/09. Aluguel a partir de R$ 198; usada de R$ 2.600 a R$ 4.300.',
+    url:'https://www.olx.com.br/materiais-de-construcao/ferramentas-de-construcao/betoneiras/estado-go/grande-goiania-e-anapolis' },
+  { tipo:'Loja', nome:'Casa Fácil — Rede da Construção', local:'Aparecida de Goiânia',
+    detalhe:'Publica preço. Cimento Ciplan CP II 50 kg a R$ 39,90 em 04/09. Av. Independência, Cidade Livre. (62) 3248-9696',
+    url:'https://casafacil.rededaconstrucao.com/cimento-ciplan-cpii-50-kg' },
+  { tipo:'Loja', nome:'BR Aço', local:'Goiânia',
+    detalhe:'Indústria de aço em GO, entrega em 24 h. CA-50 de R$ 5,80 a R$ 7,50/kg. Orçamento por WhatsApp (62) 9903-2023.',
+    url:'https://grupobraco.com.br/vergalhao/goiania/' }
+];
+
+const STATUS = ['a procurar','achei','negociando','comprado'];
+
+/* ============ utilidades ============ */
+
+const brl = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const num = v => v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const el = (t,a={},...kids)=>{const n=document.createElement(t);
+  for(const k in a){ if(k==='class')n.className=a[k]; else n.setAttribute(k,a[k]); }
+  kids.flat().forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c)); return n;};
+const svg = (t,a={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',t);
+  for(const k in a) n.setAttribute(k,a[k]); return n;};
+const store=(k,f)=>{try{const r=localStorage.getItem('obra.'+k);return r?JSON.parse(r):f;}catch(e){return f;}};
+const save=(k,v)=>{try{localStorage.setItem('obra.'+k,JSON.stringify(v));}catch(e){}};
+
+/* Área de um ambiente. A suíte é um L: desconta o banheiro que estiver em `minus`,
+   e faz isso na hora, para acompanhar o que o Renan arrastar no modo de edição. */
+function areaOf(a){
+  const m = a.minus && AMBIENTES.find(r=>r.id===a.minus);
+  return a.w*a.h - (m ? m.w*m.h : 0);
+}
+function dimOf(a){
+  const m = a.minus && AMBIENTES.find(r=>r.id===a.minus);
+  return m ? `${num(areaOf(a))} m² + banho de ${num(m.w*m.h)} m²`
+           : `${num(a.w)} × ${num(a.h)} · ${num(a.w*a.h)} m²`;
+}
+
+/* ============ abas ============ */
+
+const tabs=[...document.querySelectorAll('nav button')];
+tabs.forEach(b=>b.addEventListener('click',()=>{
+  tabs.forEach(o=>o.setAttribute('aria-selected',String(o===b)));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden = p.id!=='tab-'+b.dataset.tab);
+  // a maquete só nasce quando a aba abre — não adianta montar cena num painel
+  // escondido, o canvas mediria zero
+  if(b.dataset.tab==='tresd' && window.Maquete3D){
+    Maquete3D.iniciar();
+    if(PLANTA_SUJA){ Maquete3D.reconstruir(); PLANTA_SUJA=false; }
+    requestAnimationFrame(()=>Maquete3D.redimensionar());
+  }
+}));
+
+/* ============ planta ============ */
+
+const root=document.getElementById('planRoot');
+
+function drawPlan(){
+  root.textContent='';
+  const r=(x,y,w,h,f,extra)=>root.appendChild(svg('rect',Object.assign({x:mx(x),y:my(y),width:w*S,height:h*S,fill:f},extra||{})));
+
+  // lote e áreas descobertas
+  r(0,0,LOTE_C,LOTE_L,'var(--planOut)');
+  // vagas
+  if(RECUO>1.6){
+    r(0.60,0.60,RECUO-1.20,2.40,'none',{stroke:'var(--ink3)','stroke-width':1,'stroke-dasharray':'5 4'});
+    r(0.60,3.40,RECUO-1.20,2.40,'none',{stroke:'var(--ink3)','stroke-width':1,'stroke-dasharray':'5 4'});
+  }
+  // grama do quintal
+  if(QUINTAL>0.7) r(RECUO+CASA_L+0.30,0.30,QUINTAL-0.60,LOTE_L-0.60,'var(--furn2)',{opacity:.5});
+  // piso da casa — começa depois do corredor, não em y=0
+  r(RECUO,CORR,CASA_L,CASA_W,'var(--planFill)');
+  // os ambientes abertos (o nicho de entrada) voltam a ser área descoberta
+  AMBIENTES.filter(a=>a.aberto).forEach(a=>r(a.x,a.y,a.w,a.h,'var(--planOut)'));
+
+  if(!EDIT) drawFurniture();
+
+  // ambientes clicáveis
+  AMBIENTES.forEach(a=>{
+    const g=svg('g',{class:'room',tabindex:'0',role:'button','aria-label':a.nome,'data-id':a.id});
+    g.appendChild(svg('rect',{class:'rfill',x:mx(a.x),y:my(a.y),width:a.w*S,height:a.h*S}));
+    g.addEventListener('click',()=>selectRoom(a.id));
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectRoom(a.id);}});
+    if(EDIT){
+      g.addEventListener('pointerdown',e=>iniciarArrasto(e,a,'mover'));
+      g.appendChild(svg('rect',{x:mx(a.x),y:my(a.y),width:a.w*S,height:a.h*S,
+        fill:'none',stroke:'var(--aco)','stroke-width':1.2,'stroke-dasharray':'4 3'}));
+    }
+    root.appendChild(g);
+  });
+
+  if(EDIT) drawSimpleWalls(); else drawWalls();
+  drawLabels();
+  drawDims();
+
+  // alcinhas de redimensionar, por cima de tudo para não ficarem tapadas
+  if(EDIT) AMBIENTES.forEach(a=>{
+    const hd=svg('rect',{class:'rhandle',x:mx(a.x+a.w)-5,y:my(a.y+a.h)-5,width:10,height:10});
+    hd.addEventListener('pointerdown',e=>iniciarArrasto(e,a,'redim'));
+    root.appendChild(hd);
+  });
+}
+
+/* No modo de edição as paredes e aberturas fixas sairiam do lugar — em vez delas
+   desenho só o contorno da casa, que é o que importa para encaixar a metragem. */
+function drawSimpleWalls(){
+  root.appendChild(svg('path',{d:`M${mx(RECUO)} ${my(CORR)} H${mx(RECUO+CASA_L)} V${my(CORR+CASA_W)} H${mx(RECUO)} Z`,
+    fill:'none',stroke:'var(--planWall)','stroke-width':6}));
+  root.appendChild(svg('line',{x1:mx(RECUO),y1:my(CORR+CASA_W),x2:mx(RECUO+CASA_L),y2:my(CORR+CASA_W),
+    stroke:'var(--terra)','stroke-width':5}));
+  root.appendChild(svg('path',{d:`M${mx(0)} ${my(0)} H${mx(LOTE_C)} V${my(LOTE_L)} H${mx(0)} Z`,
+    fill:'none',stroke:'var(--ink2)','stroke-width':2.5}));
+}
+
+/* ============ modo de edição da planta ============
+
+   Arrastar move o ambiente; a alcinha do canto inferior direito redimensiona.
+   Tudo encaixa numa grade de 5 cm — obra não se mede em milímetro. Os campos
+   numéricos existem para o ajuste fino, que é onde o desenho fecha de verdade.
+   O que o Renan mexer fica salvo no navegador e sobrevive a fechar o app.      */
+
+let EDIT=false, SEL=null, DRAG=null;
+const GRID=0.05;
+const snap = v => Math.round(v/GRID)*GRID;
+const AMB_BASE = JSON.parse(JSON.stringify(AMBIENTES));
+
+const ENV_BASE = {RECUO, CASA_L, CASA_W};
+
+function plantaSalva(){
+  const d=store('planta',null); if(!d) return;
+  if(d.env){ RECUO=d.env.RECUO; CASA_L=d.env.CASA_L; CASA_W=d.env.CASA_W; }
+  (d.ambientes||d).forEach(s=>{ const a=AMBIENTES.find(r=>r.id===s.id);
+    if(a){ a.x=s.x; a.y=s.y; a.w=s.w; a.h=s.h; } });
+  recalcEnvelope();
+}
+/* A maquete 3D é remontada só quando a aba dela abre. Reconstruir a cada
+   pointermove do arrasto travaria o desenho — então aqui só marca sujo. */
+let PLANTA_SUJA=false;
+function salvarPlanta(){
+  save('planta', { env:{RECUO,CASA_L,CASA_W},
+    ambientes: AMBIENTES.map(a=>({id:a.id,x:a.x,y:a.y,w:a.w,h:a.h})) });
+  PLANTA_SUJA=true;
+}
+
+// converte um evento de ponteiro para metros da planta
+function pontoEmMetros(ev){
+  const el=document.getElementById('plan');
+  const p=el.createSVGPoint(); p.x=ev.clientX; p.y=ev.clientY;
+  const q=p.matrixTransform(el.getScreenCTM().inverse());
+  return { x:(q.x-X0)/S, y:(q.y-Y0)/S };
+}
+
+function iniciarArrasto(ev,a,modo){
+  if(!EDIT) return;
+  ev.preventDefault(); ev.stopPropagation();
+  const p=pontoEmMetros(ev);
+  DRAG={ a, modo, dx:p.x-a.x, dy:p.y-a.y, w0:a.w, h0:a.h, px:p.x, py:p.y };
+  selectRoom(a.id);
+  window.addEventListener('pointermove',moverArrasto);
+  window.addEventListener('pointerup',soltarArrasto,{once:true});
+}
+function moverArrasto(ev){
+  if(!DRAG) return;
+  const p=pontoEmMetros(ev), a=DRAG.a;
+  if(DRAG.modo==='mover'){
+    a.x=snap(p.x-DRAG.dx); a.y=snap(p.y-DRAG.dy);
+  } else {
+    a.w=Math.max(GRID*4, snap(DRAG.w0+(p.x-DRAG.px)));
+    a.h=Math.max(GRID*4, snap(DRAG.h0+(p.y-DRAG.py)));
+  }
+  drawPlan(); renderEditPanel(a.id);
+}
+function soltarArrasto(){
+  window.removeEventListener('pointermove',moverArrasto);
+  if(DRAG){ salvarPlanta(); renderAreas(); DRAG=null; }
+}
+
+function toggleEdit(on){
+  EDIT=on; DRAG=null;
+  document.getElementById('planbox').classList.toggle('editing',on);
+  document.getElementById('btEdit').textContent = on?'Concluir edição':'Editar planta';
+  document.getElementById('btReset').hidden = !on;
+  document.getElementById('editHint').textContent = on
+    ? 'Arraste para mover, puxe o canto para redimensionar. Encaixa de 5 em 5 cm. Use os campos abaixo para o número exato.'
+    : 'Clique em qualquer ambiente para ver os detalhes.';
+  document.getElementById('editPanel').hidden = !on;
+  drawPlan();
+  if(on) selectRoom(SEL||AMBIENTES[0].id);   // mantém os dois painéis no mesmo ambiente
+}
+
+function renderEditPanel(id){
+  SEL=id;
+  const a=AMBIENTES.find(r=>r.id===id); if(!a) return;
+  const box=document.getElementById('editPanel'); box.textContent='';
+  box.appendChild(el('h4',{},'Ajuste fino — '+a.nome));
+
+  const row=el('div',{class:'row'});
+  const campos=[
+    ['x','Da rua (m)','x'], ['y','Do corredor (m)','y'],
+    ['w','Comprimento (m)','w'], ['h','Largura (m)','h']
+  ];
+  campos.forEach(([k,rot])=>{
+    const inp=el('input',{type:'number',step:'0.05',min:'0',value:a[k].toFixed(2),id:'ed-'+k});
+    inp.addEventListener('input',()=>{
+      const v=parseFloat(inp.value); if(isNaN(v)) return;
+      a[k]=(k==='w'||k==='h')?Math.max(GRID*4,v):v;
+      salvarPlanta(); drawPlan(); renderAreas(); pintarFit(box);
+    });
+    row.appendChild(el('div',{class:'field'},el('label',{for:'ed-'+k},rot),inp));
+  });
+  box.appendChild(row);
+
+  // ---- contorno da casa. O lote é fixo; corredor e quintal são o que sobra dele.
+  box.appendChild(el('h4',{style:'margin:20px 0 10px'},'Contorno da casa no lote'));
+  const row2=el('div',{class:'row'});
+  const env=[
+    ['RECUO','Recuo frontal (m)',()=>RECUO,v=>RECUO=v],
+    ['CASA_L','Comprimento da casa (m)',()=>CASA_L,v=>CASA_L=v],
+    ['CASA_W','Largura da casa (m)',()=>CASA_W,v=>CASA_W=v]
+  ];
+  env.forEach(([k,rot,get,set])=>{
+    const inp=el('input',{type:'number',step:'0.05',min:'0.5',value:get().toFixed(2),id:'ev-'+k});
+    inp.addEventListener('input',()=>{
+      const v=parseFloat(inp.value); if(isNaN(v)||v<=0) return;
+      set(v); recalcEnvelope(); salvarPlanta(); drawPlan(); renderAreas(); pintarFit(box);
+      box.querySelector('#evOut').textContent=textoSobra();
+    });
+    row2.appendChild(el('div',{class:'field'},el('label',{for:'ev-'+k},rot),inp));
+  });
+  box.appendChild(row2);
+  box.appendChild(el('p',{id:'evOut',class:'hint',
+    style:'font-family:var(--mono);font-size:11px;color:var(--ink3);margin:10px 0 0'},textoSobra()));
+
+  const fit=el('div',{class:'fit'}); box.appendChild(fit);
+  pintarFit(box);
+}
+
+function textoSobra(){
+  const t=[`Lote fixo: ${num(LOTE_C)} × ${num(LOTE_L)} m.`,
+    `Sobra corredor de ${num(CORR)} m e quintal de ${num(QUINTAL)} m.`];
+  if(CORR<0.90) t.push('⚠ corredor abaixo de 0,90 m — não passa carrinho de obra nem gente com material.');
+  if(QUINTAL<0) t.push('⚠ a casa passou dos fundos do lote.');
+  if(RECUO<5.00) t.push('⚠ recuo menor que os 5,00 m adotados — conferir no Código de Obras de Aparecida.');
+  return t.join(' ');
+}
+
+/* O painel de conferência: é ele que responde “a metragem encaixou?”. */
+function pintarFit(box){
+  const fit=box.querySelector('.fit'); if(!fit) return;
+  fit.textContent='';
+  // o nicho entra na soma porque ele OCUPA lugar dentro do contorno, mesmo sem ser
+  // construído — é assim que a conta fecha contra o retângulo da casa
+  const soma=AMBIENTES.reduce((s,a)=>s+areaOf(a),0);
+  const construido=AMBIENTES.reduce((s,a)=>s+(a.aberto?0:areaOf(a)),0);
+  const casa=CASA_L*CASA_W;
+  const linha=(txt,cls)=>{const d=el('div',{},txt); if(cls)d.className=cls; fit.appendChild(d);};
+
+  linha(`Soma dos ambientes: ${num(soma)} m²  ·  retângulo da casa ${num(CASA_L)} × ${num(CASA_W)} = ${num(casa)} m²`);
+  const dif=soma-casa;
+  if(Math.abs(dif)<0.005) linha('Fecha exatamente.','ok');
+  else linha(`${dif>0?'Sobra':'Falta'} ${num(Math.abs(dif))} m² — ${dif>0?'algum ambiente passou do contorno ou dois estão sobrepostos':'ficou vazio dentro da casa'}.`,'bad');
+  if(soma-construido>0.005)
+    linha(`Área construída: ${num(construido)} m² — o resto é o nicho de entrada, que é aberto.`);
+
+  // ambientes que saem do contorno da casa
+  const fora=AMBIENTES.filter(a=>a.x<RECUO-0.001 || a.y<CORR-0.001 ||
+    a.x+a.w>RECUO+CASA_L+0.001 || a.y+a.h>CORR+CASA_W+0.001);
+  if(fora.length) linha('Fora do contorno: '+fora.map(a=>a.nome).join(', '),'bad');
+
+  // sobreposições, ignorando o banheiro que fica DENTRO da suíte de propósito
+  const pares=[];
+  for(let i=0;i<AMBIENTES.length;i++) for(let j=i+1;j<AMBIENTES.length;j++){
+    const a=AMBIENTES[i], b=AMBIENTES[j];
+    if(a.minus===b.id || b.minus===a.id) continue;
+    const ov = Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x))
+             * Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));
+    if(ov>0.005) pares.push(`${a.nome} × ${b.nome} (${num(ov)} m²)`);
+  }
+  if(pares.length) linha('Sobrepostos: '+pares.join(' · '),'bad');
+}
+
+document.getElementById('btEdit').addEventListener('click',()=>toggleEdit(!EDIT));
+document.getElementById('btReset').addEventListener('click',()=>{
+  AMB_BASE.forEach(b=>{ const a=AMBIENTES.find(r=>r.id===b.id);
+    if(a){ a.x=b.x; a.y=b.y; a.w=b.w; a.h=b.h; } });
+  RECUO=ENV_BASE.RECUO; CASA_L=ENV_BASE.CASA_L; CASA_W=ENV_BASE.CASA_W;
+  recalcEnvelope();
+  save('planta',null); PLANTA_SUJA=true;
+  drawPlan(); renderAreas(); renderEditPanel(SEL||AMBIENTES[0].id);
+});
+
+function drawFurniture(){
+  const F='var(--furn)',F2='var(--furn2)';
+  const r=(x,y,w,h,f)=>root.appendChild(svg('rect',{x:mx(x),y:my(y),width:w*S,height:h*S,fill:f}));
+
+  // quarto 01 — cama com cabeceira na fachada frontal + guarda-roupa na parede do vão
+  r(5.15,4.20,2.00,1.60,F); r(5.15,4.20,0.35,1.60,F2);
+  r(5.15,3.55,2.60,0.45,F2);
+  // banheiro — box e vaso
+  r(8.10,5.30,0.95,0.95,F2); r(8.35,3.55,0.50,0.55,F2);
+  // sala — ripado na divisa, sofá, mesa
+  r(9.40,6.24,3.00,0.12,'var(--wood)');
+  r(9.60,5.33,2.00,0.85,F);
+  root.appendChild(svg('circle',{cx:mx(12.60),cy:my(3.80),r:0.75*S,fill:F2}));
+  // cozinha — bancada em L na divisa + península
+  r(13.40,5.75,1.70,0.60,F); r(14.50,4.15,0.60,1.60,F);
+  r(13.20,3.40,1.60,0.45,'#c9bfb8');
+  // quarto 02 — cama com cabeceira na divisa + guarda-roupa
+  r(15.80,4.70,2.00,1.60,F); r(15.80,5.95,2.00,0.35,F2);
+  r(18.30,5.70,1.60,0.60,F2);
+  // banheiro da suíte — box no canto dos fundos e vaso
+  r(19.10,3.35,0.95,0.95,F2); r(18.85,2.60,0.50,0.55,F2);
+}
+
+function drawWalls(){
+  const line=(x1,y1,x2,y2,st,w)=>root.appendChild(svg('line',
+    {x1:mx(x1),y1:my(y1),x2:mx(x2),y2:my(y2),stroke:st,'stroke-width':w,'stroke-linecap':'square'}));
+
+  // paredes internas. A parede em y=3,40 e a em x=9,20 acima dela viraram FACHADA:
+  // dão para o nicho aberto, e é nelas que ficam as três portas da casa.
+  [[8.00,3.40,8.00,6.40],[15.20,2.40,15.20,6.40],
+   [18.70,2.40,18.70,4.40],[18.70,4.40,20.20,4.40]]
+    .forEach(w=>line(w[0],w[1],w[2],w[3],'var(--planWall)',4));
+
+  // vãos internos que sobraram: passagem sala/quarto 02 e porta do banheiro da suíte
+  [[15.20,2.55,15.20,3.20],[18.70,3.45,18.70,4.15]]
+    .forEach(w=>line(w[0],w[1],w[2],w[3],'var(--planFill)',6));
+
+  // envoltória em L — o canto da frente com o corredor é recortado pelo nicho de
+  // entrada, que fica aberto nas duas faces externas
+  const N=AMBIENTES.find(a=>a.id==='nicho');
+  const X0m=RECUO, X1=RECUO+CASA_L, Y0m=CORR, Y1=CORR+CASA_W;
+  root.appendChild(svg('path',{d: N
+    ? `M${mx(X0m+N.w)} ${my(Y0m)} H${mx(X1)} V${my(Y1)} H${mx(X0m)} V${my(Y0m+N.h)} H${mx(X0m+N.w)} Z`
+    : `M${mx(X0m)} ${my(Y0m)} H${mx(X1)} V${my(Y1)} H${mx(X0m)} Z`,
+    fill:'none',stroke:'var(--planWall)','stroke-width':6}));
+
+  // janelas na fachada do corredor (y = 2,40): as duas da sala, o quarto 02
+  // e o banheiro da suíte
+  const janelas=[[10.00,11.50],[12.20,13.70],[16.20,18.00],[19.05,19.95]];
+  janelas.forEach(([a,b])=>{ line(a,2.40,b,2.40,'var(--planFill)',8); line(a,2.40,b,2.40,'var(--aco)',2); });
+  // porta lateral da sala e porta do quintal, saindo da suíte
+  line(14.20,2.40,15.00,2.40,'var(--planFill)',8);
+  line(20.20,4.80,20.20,5.80,'var(--planFill)',8);
+
+  // AS TRÊS PORTAS QUE ABREM PARA O NICHO. Quarto 01 e banheiro na parede y=3,40;
+  // a porta da sala no fundo do nicho, na parede x=9,20.
+  [[5.40,6.30],[8.20,8.90]].forEach(([a,b])=>{
+    line(a,3.40,b,3.40,'var(--planFill)',8);
+    root.appendChild(svg('path',{d:`M${mx(a)} ${my(3.40)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(a)} ${my(3.40+(b-a))}`,
+      fill:'none',stroke:'var(--ink2)','stroke-width':1.1}));
+  });
+  line(9.20,2.55,9.20,3.35,'var(--planFill)',8);
+  root.appendChild(svg('path',{d:`M${mx(9.20)} ${my(3.35)} A${0.80*S} ${0.80*S} 0 0 1 ${mx(10.00)} ${my(3.35)}`,
+    fill:'none',stroke:'var(--ink2)','stroke-width':1.3}));
+
+  // janela do quarto 01 na fachada frontal
+  line(5.00,4.00,5.00,5.80,'var(--planFill)',8); line(5.00,4.00,5.00,5.80,'var(--aco)',2);
+
+  // divisa cega
+  line(RECUO,6.40,RECUO+CASA_L,6.40,'var(--terra)',5);
+
+  // divisas do lote
+  root.appendChild(svg('path',{d:`M${mx(0)} ${my(0)} H${mx(LOTE_C)} V${my(LOTE_L)} H${mx(0)} Z`,
+    fill:'none',stroke:'var(--ink2)','stroke-width':2.5}));
+}
+
+function drawLabels(){
+  const txt=(x,y,s,o={})=>{const t=svg('text',{x:mx(x),y:my(y),'text-anchor':'middle',
+    'font-size':o.size||12,'font-weight':o.weight||'400',fill:o.fill||'var(--ink)','letter-spacing':o.ls||'0'});
+    if(o.mono)t.setAttribute('class','mono');
+    t.textContent=s; t.style.pointerEvents='none'; root.appendChild(t); return t;};
+
+  AMBIENTES.forEach(a=>{
+    // `area` e `lx`/`ly` existem para a suíte, que é um L: o retângulo clicável é o
+    // 4,00 × 5,00 inteiro, mas a área real desconta o banheiro e o rótulo foge dele.
+    const area = areaOf(a);
+    const cx = a.lx || a.x+a.w/2, cy = a.ly || a.y+a.h/2;
+    if(a.small){
+      txt(cx,cy-0.12,(a.short||a.nome).toUpperCase(),{size:9,weight:'700',ls:'.04em'});
+      txt(cx,cy+0.30,`${num(area)} m²`,{size:9,fill:'var(--ink3)',mono:true});
+    } else if(a.h*S < 60){
+      txt(cx,cy+0.10,`${a.nome.toUpperCase()} · ${num(area)} m²`,{size:10.5,weight:'700',ls:'.05em'});
+    } else if(a.w*S < 90){
+      const t=txt(cx,cy,`${a.nome} · ${num(area)} m²`,{size:10.5,weight:'700',ls:'.04em'});
+      t.setAttribute('transform',`rotate(-90 ${mx(cx)} ${my(cy)})`);
+    } else {
+      txt(cx,cy-0.10,a.nome.toUpperCase(),{size:11.5,weight:'700',ls:'.06em'});
+      txt(cx,cy+0.32,dimOf(a),{size:10.5,fill:'var(--ink3)',mono:true});
+    }
+  });
+
+  txt(RECUO/2,2.90,'GARAGEM · 2 VAGAS',{size:11.5,weight:'700',ls:'.06em',fill:'var(--ink2)'});
+  txt(RECUO/2,3.30,`recuo frontal ${num(RECUO)} m`,{size:10.5,fill:'var(--ink3)',mono:true});
+  txt(RECUO+CASA_L+QUINTAL/2,2.90,'QUINTAL',{size:11.5,weight:'700',ls:'.06em',fill:'var(--ink2)'});
+  txt(RECUO+CASA_L+QUINTAL/2,3.30,`${num(QUINTAL)} × ${num(LOTE_L)} · ${num(QUINTAL*LOTE_L)} m²`,
+    {size:10.5,fill:'var(--ink3)',mono:true});
+  txt(RECUO+CASA_L/2,CORR/2-0.25,`CORREDOR LATERAL · ${num(CORR)} m — quase todas as janelas dão para cá`,
+    {size:11,weight:'700',ls:'.08em',fill:'var(--ink2)'});
+  const d=txt(RECUO+CASA_L/2,LOTE_L,'DIVISA CEGA — SEM NENHUMA ABERTURA',{size:9.5,ls:'.1em',fill:'var(--terra)',mono:true});
+  d.setAttribute('y',my(LOTE_L)+20);
+  txt(0.70,6.85,'RUA',{size:11.5,weight:'700',ls:'.18em',fill:'var(--terra)',mono:true});
+}
+
+function drawDims(){
+  const g=svg('g',{stroke:'var(--aco)','stroke-width':1.2,fill:'var(--aco)','font-size':11,'text-anchor':'middle'});
+  g.setAttribute('class','mono');
+  const dim=(a,b,yPx,label,big)=>{
+    g.appendChild(svg('line',{x1:mx(a),y1:yPx,x2:mx(b),y2:yPx,'marker-start':'url(#tk)','marker-end':'url(#tk)'}));
+    const t=svg('text',{x:mx((a+b)/2),y:yPx-6,'font-size':big?12.5:11,'font-weight':big?'700':'400'});
+    t.textContent=label; g.appendChild(t);
+  };
+  // cadeia de cotas montada a partir das divisas reais dos ambientes, para
+  // acompanhar o que for arrastado no modo de edição
+  const FIM=RECUO+CASA_L;
+  const cortes=[...new Set(AMBIENTES.flatMap(a=>[a.x,a.x+a.w])
+    .filter(v=>v>RECUO+0.001 && v<FIM-0.001).map(v=>+v.toFixed(2)))].sort((a,b)=>a-b);
+  [0,RECUO,...cortes,FIM,LOTE_C].reduce((p,v)=>{
+    if(v-p>0.02) dim(p,v,96,num(v-p));
+    return v;
+  });
+  dim(0,LOTE_C,62,`${num(LOTE_C)} — profundidade do lote`,true);
+  dim(RECUO,FIM,432,`${num(CASA_L)} — comprimento da casa`,true);
+
+  const vd=(a,b,xPx,label)=>{
+    g.appendChild(svg('line',{x1:xPx,y1:my(a),x2:xPx,y2:my(b),'marker-start':'url(#tk)','marker-end':'url(#tk)'}));
+    const t=svg('text',{x:xPx-7,y:my((a+b)/2),transform:`rotate(-90 ${xPx-7} ${my((a+b)/2)})`});
+    t.textContent=label; g.appendChild(t);
+  };
+  if(CORR>0.05) vd(0,CORR,44,num(CORR));
+  vd(CORR,LOTE_L,44,num(CASA_W));
+  root.appendChild(g);
+
+  const sc=svg('g',{transform:`translate(${mx(LOTE_C-3.0)} 452)`});
+  sc.appendChild(svg('line',{x1:0,y1:0,x2:2*S,y2:0,stroke:'var(--ink)','stroke-width':1.4}));
+  [0,S,2*S].forEach(x=>sc.appendChild(svg('line',{x1:x,y1:-4,x2:x,y2:4,stroke:'var(--ink)','stroke-width':1.4})));
+  const st=svg('text',{x:S,y:17,'text-anchor':'middle','font-size':10,fill:'var(--ink3)',class:'mono'});
+  st.textContent='0 — 1 — 2 m'; sc.appendChild(st);
+  root.appendChild(sc);
+}
+
+function selectRoom(id){
+  document.querySelectorAll('.room').forEach(g=>g.classList.toggle('sel',g.dataset.id===id));
+  const a=AMBIENTES.find(r=>r.id===id)||EXTERNOS.find(r=>r.id===id);
+  const area=a.area!=null?a.area:areaOf(a);
+  if(EDIT) renderEditPanel(id);
+  const box=document.getElementById('roomInfo'); box.textContent='';
+  box.appendChild(el('h3',{},`${a.nome} — ${num(area)} m²`));
+  box.appendChild(el('p',{},`${num(a.w)} × ${num(a.h)} m · construído na Etapa ${a.etapa}. ${a.obs}`));
+}
+
+/* ============ áreas ============ */
+
+function renderAreas(){
+  const t=document.getElementById('areasTable'); t.textContent='';
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Ambiente'),el('th',{class:'n'},'Dimensões (m)'),
+    el('th',{class:'n'},'Área'),el('th',{class:'n'},'Etapa'))));
+  const tb=el('tbody'); let tot=0;
+  // a suíte é um L: areaOf já desconta o banheiro, senão o total daria 63,80 m²
+  // o nicho é `aberto`: aparece na lista mas NÃO entra na área construída
+  AMBIENTES.forEach(a=>{const ar=areaOf(a); if(!a.aberto) tot+=ar;
+    tb.appendChild(el('tr',{},
+      el('td',{},a.nome+(a.aberto?' (aberto, não construído)':'')),
+      el('td',{class:'n'},a.minus?`${num(a.w)} × ${num(a.h)} − banho`:`${num(a.w)} × ${num(a.h)}`),
+      el('td',{class:'n'},num(ar)+' m²'),el('td',{class:'n'},String(a.etapa))));});
+  t.appendChild(tb);
+  const tf=el('tfoot');
+  tf.appendChild(el('tr',{},el('td',{},'Área construída'),
+    el('td',{class:'n'},`${num(CASA_W)} × ${num(CASA_L)} − nicho`),
+    el('td',{class:'n'},num(tot)+' m²'),el('td',{})));
+  EXTERNOS.forEach(e=>tf.appendChild(el('tr',{},
+    el('td',{style:'font-weight:400;color:var(--ink3)'},e.nome+' (descoberto)'),
+    el('td',{class:'n',style:'font-weight:400;color:var(--ink3)'},`${num(e.w)} × ${num(e.h)}`),
+    el('td',{class:'n',style:'font-weight:400;color:var(--ink3)'},num(e.area)+' m²'),el('td',{}))));
+  tf.appendChild(el('tr',{},el('td',{},'Terreno'),el('td',{class:'n'},'6,40 × 29,00'),
+    el('td',{class:'n'},'185,60 m²'),el('td',{class:'n'},'ocup. 32,8%')));
+  t.appendChild(tf);
+}
+
+/* ============ etapas ============ */
+
+function renderEtapas(){
+  const t=document.getElementById('etapasTable'); t.textContent='';
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{class:'n'},'#'),el('th',{},'Etapa'),el('th',{class:'n'},'Área'),
+    el('th',{class:'n'},'Material'),el('th',{class:'n'},'Serviços'),el('th',{class:'n'},'Total'))));
+  const tb=el('tbody'); let m=0,s=0;
+  ETAPAS.forEach(e=>{m+=e.mat; s+=e.tec;
+    tb.appendChild(el('tr',{},
+      el('td',{class:'n'},String(e.n)),
+      el('td',{},el('b',{},e.nome),el('br'),
+        el('span',{style:'color:var(--ink2);font-size:13px'},e.desc)),
+      el('td',{class:'n'},e.area?num(e.area)+' m²':'—'),
+      el('td',{class:'n'},brl(e.mat)),el('td',{class:'n'},brl(e.tec)),
+      el('td',{class:'n'},brl(e.mat+e.tec))));});
+  t.appendChild(tb);
+  t.appendChild(el('tfoot',{},el('tr',{},
+    el('td',{}),el('td',{},'Total da obra'),el('td',{class:'n'},'60,80 m²'),
+    el('td',{class:'n'},brl(m)),el('td',{class:'n'},brl(s)),el('td',{class:'n'},brl(m+s)))));
+}
+
+/* ============ dinheiro ============ */
+
+const inCap=document.getElementById('inCap'),inMes=document.getElementById('inMes'),inEcon=document.getElementById('inEcon');
+
+function fmtPrazo(mm){
+  if(!isFinite(mm)) return 'nunca';
+  if(mm<=0) return 'já tem';
+  const a=Math.floor(mm/12), r=mm%12;
+  return (a?a+(a>1?' anos':' ano'):'')+(a&&r?' e ':'')+(r?r+(r>1?' meses':' mês'):'');
+}
+
+function renderMoney(){
+  const cap=Math.max(0,+inCap.value||0), mes=Math.max(0,+inMes.value||0), ec=+inEcon.value||0;
+  const custo=e=>e.mat*(1-ec*0.6)+e.tec;
+  const total=ETAPAS.reduce((a,e)=>a+custo(e),0);
+  const geral=total*1.10;
+  const mesesPara=alvo=>mes<=0?Infinity:Math.max(0,Math.ceil((alvo-cap)/mes));
+
+  const cards=document.getElementById('moneyCards'); cards.textContent='';
+  const mk=(k,v,sub,hi)=>{const c=el('div',{class:'card'+(hi?' hi':'')});
+    c.appendChild(el('p',{class:'k'},k));
+    const p=el('p',{class:'v'},v); if(sub)p.appendChild(el('small',{},' '+sub));
+    c.appendChild(p); return c;};
+  cards.appendChild(mk('Custo total da obra',brl(geral),'com 10% de folga'));
+  cards.appendChild(mk('Só o material',brl(ETAPAS.reduce((a,e)=>a+e.mat*(1-ec*0.6),0))));
+  cards.appendChild(mk('Serviços técnicos',brl(ETAPAS.reduce((a,e)=>a+e.tec,0))));
+  const mE1=mesesPara(custo(ETAPAS[0])+custo(ETAPAS[1]));
+  cards.appendChild(mk('Até poder morar',fmtPrazo(mE1),'',true));
+
+  const t=document.getElementById('prazoTable'); t.textContent='';
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{class:'n'},'#'),el('th',{},'Etapa'),el('th',{class:'n'},'Custo'),
+    el('th',{class:'n'},'Acumulado'),el('th',{class:'n'},'Fecha em'),el('th',{},'Linha do tempo'))));
+  const tb=el('tbody'); let acc=0;
+  const totMeses=mesesPara(geral);
+  ETAPAS.forEach(e=>{
+    const c=custo(e); acc+=c;
+    const mm=mesesPara(acc);
+    const pct=isFinite(totMeses)&&totMeses>0?Math.min(100,(mm/totMeses)*100):100;
+    const bar=el('div',{class:'gantt'});
+    bar.appendChild(el('i',{style:`width:${pct}%;background:${e.n<=1?'var(--terra)':'var(--aco)'}`}));
+    tb.appendChild(el('tr',{},
+      el('td',{class:'n'},String(e.n)),el('td',{},e.nome),
+      el('td',{class:'n'},brl(c)),el('td',{class:'n'},brl(acc)),
+      el('td',{class:'n'},isFinite(mm)?`mês ${mm}`:'—'),el('td',{},bar)));
+  });
+  t.appendChild(tb);
+  t.appendChild(el('tfoot',{},el('tr',{},
+    el('td',{}),el('td',{},'Com a folga de 10%'),el('td',{class:'n'},brl(geral-total)),
+    el('td',{class:'n'},brl(geral)),el('td',{class:'n'},isFinite(totMeses)?`mês ${totMeses}`:'—'),el('td',{}))));
+
+  const v=document.getElementById('verdict'); v.textContent='';
+  const dobro=mes>0?Math.ceil((geral-cap)/(mes*2)):Infinity;
+  v.appendChild(el('p',{style:'margin:0 0 8px'},
+    el('b',{},'O que esses números dizem. '),
+    `Com ${brl(cap)} hoje e ${brl(mes)} por mês, o bloco da frente — quarto e banheiro — fica pronto em ${fmtPrazo(mE1)}, e a casa inteira em ${fmtPrazo(totMeses)}.`));
+  v.appendChild(el('p',{style:'margin:0'},
+    `Dobrando o aporte para ${brl(mes*2)} por mês, a casa inteira cai para ${fmtPrazo(dobro)}. O aporte mensal é a alavanca que mais encurta o prazo — mais do que qualquer economia em material.`));
+}
+
+[inCap,inMes,inEcon].forEach(i=>i.addEventListener('input',()=>{
+  save('cfg',{c:inCap.value,m:inMes.value,e:inEcon.value});
+  renderMoney(); renderAchados(); renderAlicerce();}));
+document.getElementById('btnReset').addEventListener('click',()=>{
+  inCap.value=6000; inMes.value=1000; inEcon.value='0.15';
+  save('cfg',{c:6000,m:1000,e:'0.15'}); renderMoney(); renderAchados(); renderAlicerce();});
+
+/* ============ compras ============ */
+
+function renderCompras(){
+  const done=store('chk',{});
+  const box=document.getElementById('comprasList'); box.textContent='';
+  let tot=0,feitos=0;
+  COMPRAS.forEach((g,gi)=>{
+    box.appendChild(el('p',{class:'grouphead'},g.grupo));
+    const ul=el('ul',{class:'chk'});
+    g.itens.forEach((it,ii)=>{
+      const key=gi+'.'+ii; tot++;
+      const on=!!done[key]; if(on)feitos++;
+      const cb=el('input',{type:'checkbox'}); cb.checked=on;
+      cb.addEventListener('change',()=>{const d=store('chk',{});
+        if(cb.checked)d[key]=1; else delete d[key]; save('chk',d); renderCompras();});
+      const li=el('li',{class:on?'done':''});
+      li.appendChild(cb);
+      li.appendChild(el('div',{class:'txt'},
+        el('b',{},it.t),' ',el('span',{class:'tag '+it.tag},it.tag==='novo'?'novo':'pode ser usado'),
+        el('br'),el('span',{style:'color:var(--ink2);font-size:13.5px'},it.d)));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  });
+  document.getElementById('chkCount').textContent=`${feitos} de ${tot} itens marcados`;
+}
+document.getElementById('btnClearChk').addEventListener('click',()=>{save('chk',{});renderCompras();});
+
+/* ============ alicerce ============ */
+
+/* Quantidades calculadas da planta em 04/09/2026. Detalhe do cálculo em
+   01-orcamento/alicerce-quantitativo.md. */
+const ALI_QTD = [
+  { it:'Linear de fundação — perímetro externo + 4 paredes internas', q:'54 m' },
+  { it:'Escavação da vala — 0,40 larg × 0,60 prof', q:'13 m³' },
+  { it:'Lastro de brita — 0,40 × 0,05', q:'1,1 m³' },
+  { it:'Sapata corrida — 0,40 × 0,20', q:'4,32 m³ de concreto' },
+  { it:'Viga baldrame — 0,15 × 0,30', q:'2,43 m³ de concreto' },
+  { it:'Concreto total, com 5% de perda', q:'7,0 m³' },
+  { it:'Aço, com 10% de perda', q:'260 kg — 47 barras Ø8,0 + 20 barras Ø5,0' },
+  { it:'Formas — 2 faces × 0,30 m × 54 m', q:'32,4 m²' },
+  { it:'Impermeabilização — laterais e topo', q:'40,5 m²' }
+];
+
+/* `ok:true` = preço encontrado e confiável. `ok:false` = achado, mas de fonte
+   não-local: entra na conta e fica marcado para confirmar antes de comprar. */
+const ALI_PRECO = [
+  { it:'Aço CA-50 Ø8,0 mm', q:'47 barras de 12 m · 223 kg', pu:'R$ 6,50/kg', t:1448, ok:true,
+    f:'BR Aço — indústria em GO, entrega em 24 h. Faixa publicada R$ 5,80 a R$ 7,50/kg.' },
+  { it:'Aço CA-60 Ø5,0 mm', q:'20 barras de 12 m · 37 kg', pu:'R$ 6,50/kg', t:240, ok:true,
+    f:'BR Aço — mesma cotação. Fechar por WhatsApp (62) 9903-2023.' },
+  { it:'Cimento CP II 50 kg', q:'45 sacos', pu:'R$ 39,90', t:1796, ok:true,
+    f:'Casa Fácil · Av. Independência, Cidade Livre, Aparecida de Goiânia · (62) 3248-9696' },
+  { it:'Areia média lavada', q:'caminhão de 8 m³ (usa 4,5 no alicerce)', pu:'R$ 174/m³', t:1392, ok:true,
+    f:'Expansul · Aparecida de Goiânia · WhatsApp (62) 9 9493-7050. Tabela lida no anúncio da OLX em 07/09: 8 m³ por R$ 1.392, 13 m³ por R$ 2.250. Não vende fração — os 3,5 m³ de sobra vão para contrapiso e alvenaria.' },
+  { it:'Brita nº 1', q:'caminhão de 10 t ≈ 6,7 m³', pu:'R$ 231/m³', t:1540, ok:true,
+    f:'Expansul · mesmo anúncio · (62) 9 9493-7050. Carga fechada de 10 t por R$ 1.540; 15 t por R$ 2.310. Cotar contra: Tijolo e Areia Atacado (62) 9 9238-9683, brita direto da pedreira, e Pedreira Itaúna (62) 3094-2222.' },
+  { it:'Madeira para forma', q:'32,4 m² · lote', pu:'lote', t:200, ok:true,
+    f:'OLX — lote em Senador Canedo. Há também doação de madeira em Goiânia, Setor Centro Oeste.' },
+  { it:'Betoneira 400 L', q:'aluguel', pu:'R$ 198', t:198, ok:true,
+    f:'OLX — aluguel em Goiânia, anúncio de 04/09. Ver a comparação abaixo.' }
+];
+
+const ALI_FALTA = ['arame recozido nº 18 (5 kg)','sarrafo de travamento (60 m) e pregos (5 kg)',
+  'lona plástica preta (1 rolo de 4 × 50 m)','pintura asfáltica (2 latas de 18 L)'];
+
+const ALI_BET = [
+  { o:'Aluguel de betoneira 400 L', p:198,  l:'Goiânia, Goiânia 2', hi:true },
+  { o:'“Betoneira barata”',          p:2600, l:'Aparecida de Goiânia, Vila Oliveira' },
+  { o:'CSM 400 L monofásica 220 V',  p:3199, l:'Aparecida, Cidade Satélite São Luiz' },
+  { o:'Betoneira',                   p:3500, l:'Goiânia, Ipiranga' },
+  { o:'Horbakc usada, bom estado',   p:3600, l:'Goianira, Residencial Triunfo' },
+  { o:'Metalpama 400 L 2,0 CV',      p:4300, l:'Goiânia, Residencial Ytapuã' }
+];
+
+const ALI_TOTAL = ALI_PRECO.reduce((a,x)=>a+x.t,0);
+const mesesTxt = v => v.toFixed(1).replace(".",",");
+const SPT_TABELA = 1641, SPT_ORCADO = 1800;
+
+function renderAlicerce(){
+  const cap=Math.max(0,+inCap.value||0), mes=Math.max(1,+inMes.value||1000);
+
+  const cards=document.getElementById('aliCards'); cards.textContent='';
+  const mk=(k,v,sub,hi)=>{const c=el('div',{class:'card'+(hi?' hi':'')});
+    c.appendChild(el('p',{class:'k'},k));
+    const p=el('p',{class:'v'},v); if(sub)p.appendChild(el('small',{},' '+sub));
+    c.appendChild(p); return c;};
+  cards.appendChild(mk('Linear de fundação','54 m'));
+  cards.appendChild(mk('Concreto','7,0 m³','45 sacos de cimento'));
+  cards.appendChild(mk('Aço','260 kg','67 barras de 12 m'));
+  cards.appendChild(mk('Custo pesquisado',brl(ALI_TOTAL),
+    `= ${mesesTxt(ALI_TOTAL/mes)} meses de aporte`,true));
+
+  const trava=document.getElementById('aliTrava'); trava.textContent='';
+  trava.appendChild(el('p',{style:'margin:0'},
+    el('b',{},'Trava do projeto. '),
+    'Este levantamento pressupõe solo firme. A sondagem SPT tem que vir antes de comprar qualquer coisa: se o solo for mole, muda o sistema de fundação inteiro e nada desta aba continua valendo.'));
+
+  const tq=document.getElementById('aliQtd'); tq.textContent='';
+  tq.appendChild(el('thead',{},el('tr',{},el('th',{},'Item'),el('th',{class:'n'},'Quantidade'))));
+  const tqb=el('tbody');
+  ALI_QTD.forEach(r=>tqb.appendChild(el('tr',{},el('td',{},r.it),el('td',{class:'n'},r.q))));
+  tq.appendChild(tqb);
+
+  const tp=document.getElementById('aliPreco'); tp.textContent='';
+  tp.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Item'),el('th',{},'Quantidade'),el('th',{class:'n'},'Preço'),
+    el('th',{class:'n'},'Total'),el('th',{},'De onde veio o número'))));
+  const tpb=el('tbody');
+  ALI_PRECO.forEach(r=>{
+    tpb.appendChild(el('tr',{},
+      el('td',{},el('b',{},r.it),' ',
+        el('span',{class:'tag '+(r.ok?'usado':'novo')},r.ok?'confirmado':'confirmar')),
+      el('td',{},r.q),
+      el('td',{class:'n'},r.pu),
+      el('td',{class:'n',style:'font-weight:600'},brl(r.t)),
+      el('td',{style:'color:var(--ink2);font-size:13.5px'},r.f)));
+  });
+  tp.appendChild(tpb);
+  tp.appendChild(el('tfoot',{},el('tr',{},
+    el('td',{},'Total pesquisado'),el('td',{}),el('td',{}),
+    el('td',{class:'n'},brl(ALI_TOTAL)),
+    el('td',{},`${mesesTxt(ALI_TOTAL/mes)} meses de aporte`))));
+
+  document.getElementById('aliFalta').textContent =
+    'Ainda sem preço: '+ALI_FALTA.join(' · ')+'. São itens baratos, mas somam — não entram no total acima justamente para não fingir que somam zero.';
+
+  const tb=document.getElementById('aliBet'); tb.textContent='';
+  tb.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Anúncio'),el('th',{class:'n'},'Preço'),el('th',{},'Onde'))));
+  const tbb=el('tbody');
+  ALI_BET.forEach(r=>{
+    tbb.appendChild(el('tr',{},
+      el('td',{},r.hi?el('b',{},r.o):r.o),
+      el('td',{class:'n',style:r.hi?'font-weight:700;color:var(--ok)':''},brl(r.p)),
+      el('td',{style:'color:var(--ink2)'},r.l)));
+  });
+  tb.appendChild(tbb);
+
+  const bn=document.getElementById('aliBetNota'); bn.textContent='';
+  const dif=2600-198;
+  bn.appendChild(el('p',{style:'margin:0'},
+    el('b',{},'Alugar. '),
+    `São 7 m³ de concreto, dois ou três dias de trabalho. R$ 198 contra R$ 2.600 é uma diferença de ${brl(dif)} — ${mesesTxt(dif/mes)} meses de aporte — e sem o risco de máquina usada quebrar no meio da concretagem. Comprar só se a betoneira for usada de novo nas etapas 2 e 3, e ainda assim comparando com o aluguel acumulado.`));
+
+  const sp=document.getElementById('aliSpt'); sp.textContent='';
+  sp.appendChild(el('p',{style:'margin:0 0 8px'},
+    el('b',{},'O orçamento está baixo. '),
+    `A etapa 0 reserva ${brl(SPT_ORCADO)} para 2 furos. Isso só se sustenta a preço de tabela pública do Estado — AGEHAB/GOINFRA, R$ 820,41 por furo de 10 m, ou ${brl(SPT_TABELA)} pelos dois.`));
+  sp.appendChild(el('p',{style:'margin:0'},
+    'O mercado de 2026 cobra R$ 250 a R$ 900 por metro perfurado, e sondagem residencial de 1 a 2 furos sai entre R$ 3.000 e R$ 8.000. Orçar de R$ 1.650 a R$ 4.000 e pedir três propostas locais.'));
+
+  const ord=document.getElementById('aliOrdem'); ord.textContent='';
+  const comSpt=ALI_TOTAL+SPT_TABELA;
+  const cabe=ALI_TOTAL<=cap;
+  ord.appendChild(el('p',{class:'sub',style:'margin-bottom:14px'},
+    `Alicerce pesquisado: ${brl(ALI_TOTAL)}. Capital em caixa: ${brl(cap)}. `+
+    (cabe
+      ? `O alicerce inteiro cabe no dinheiro que já existe — mas a sondagem disputa esse mesmo dinheiro: com ela, o pacote vai a ${brl(comSpt)} e falta cerca de ${Math.max(0,Math.ceil((comSpt-cap)/mes))} mês de aporte, mais os quatro itens ainda sem preço.`
+      : `Faltam ${brl(ALI_TOTAL-cap)} — ${Math.ceil((ALI_TOTAL-cap)/mes)} meses de aporte. Com a sondagem, ${brl(comSpt)}.`)));
+  const passos=[
+    'Fazer a sondagem primeiro, com R$ 1.650 a R$ 4.000 do caixa.',
+    'Só depois comprar. Se o solo for mole, este levantamento inteiro é descartado — comprar aço antes da sondagem é queimar '+brl(1688)+' num projeto que pode mudar.',
+    'Aço, areia e brita não vencem: podem ser comprados assim que o solo for aprovado.',
+    'Cimento por último, na semana da concretagem — vence em 3 meses.'
+  ];
+  const ol=el('ol',{style:'margin:0;padding-left:20px;line-height:1.65'});
+  passos.forEach(p=>ol.appendChild(el('li',{style:'margin-bottom:7px'},p)));
+  ord.appendChild(ol);
+}
+
+/* ============ achados ============ */
+
+const aSel=document.getElementById('aItem');
+ALVOS.forEach(a=>aSel.appendChild(el('option',{value:a.id},a.item)));
+
+function renderAchados(){
+  const st=store('alvoStatus',{});
+  const mes=Math.max(1,+inMes.value||1000);
+  const economiaTotal=ALVOS.reduce((a,x)=>a+(x.novo-x.meta),0);
+  const comprado=ALVOS.filter(x=>st[x.id]==='comprado');
+  const economiaFeita=comprado.reduce((a,x)=>a+(x.novo-x.meta),0);
+
+  const cards=document.getElementById('cacaCards'); cards.textContent='';
+  const mk=(k,v,sub,hi)=>{const c=el('div',{class:'card'+(hi?' hi':'')});
+    c.appendChild(el('p',{class:'k'},k));
+    const p=el('p',{class:'v'},v); if(sub)p.appendChild(el('small',{},' '+sub));
+    c.appendChild(p); return c;};
+  cards.appendChild(mk('Custo se comprar tudo novo',brl(ALVOS.reduce((a,x)=>a+x.novo,0))));
+  cards.appendChild(mk('Custo caçando barato',brl(ALVOS.reduce((a,x)=>a+x.meta,0))));
+  cards.appendChild(mk('Já garantido',brl(economiaFeita),`${comprado.length} de ${ALVOS.length} itens`));
+  cards.appendChild(mk('Economia possível',brl(economiaTotal),
+    `= ${Math.round(economiaTotal/mes)} meses de aporte`,true));
+
+  const t=document.getElementById('alvosTable'); t.textContent='';
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Item'),el('th',{class:'n'},'Qtd'),el('th',{class:'n'},'Novo'),
+    el('th',{class:'n'},'Meta usado'),el('th',{class:'n'},'Economia'),
+    el('th',{class:'n'},'Meses'),el('th',{},'Status'))));
+  const tb=el('tbody');
+  ALVOS.slice().sort((a,b)=>(b.novo-b.meta)-(a.novo-a.meta)).forEach(x=>{
+    const ec=x.novo-x.meta;
+    const cur=st[x.id]||STATUS[0];
+    const btn=el('button',{class:'mini'},cur);
+    if(cur==='comprado') btn.className='tag usado';
+    else if(cur!=='a procurar') btn.className='tag novo';
+    btn.style.cursor='pointer';
+    btn.addEventListener('click',()=>{
+      const d=store('alvoStatus',{});
+      d[x.id]=STATUS[(STATUS.indexOf(cur)+1)%STATUS.length];
+      save('alvoStatus',d); renderAchados();
+    });
+    tb.appendChild(el('tr',{},
+      el('td',{},el('b',{},x.item),el('br'),
+        el('span',{style:'color:var(--ink2);font-size:13px'},x.onde)),
+      el('td',{class:'n'},x.qtd),
+      el('td',{class:'n'},brl(x.novo)),
+      el('td',{class:'n'},brl(x.meta)),
+      el('td',{class:'n',style:'color:var(--ok);font-weight:600'},brl(ec)),
+      el('td',{class:'n'},(ec/mes).toFixed(1)),
+      el('td',{},btn)));
+  });
+  t.appendChild(tb);
+  t.appendChild(el('tfoot',{},el('tr',{},
+    el('td',{},'Total'),el('td',{}),
+    el('td',{class:'n'},brl(ALVOS.reduce((a,x)=>a+x.novo,0))),
+    el('td',{class:'n'},brl(ALVOS.reduce((a,x)=>a+x.meta,0))),
+    el('td',{class:'n'},brl(economiaTotal)),
+    el('td',{class:'n'},(economiaTotal/mes).toFixed(0)),el('td',{}))));
+
+  renderAchadosLista();
+  renderFontes();
+}
+
+function renderAchadosLista(){
+  const list=store('achados',[]);
+  const t=document.getElementById('achadosTable'); t.textContent='';
+  if(!list.length){
+    t.appendChild(el('caption',{class:'empty'},'Nenhum achado registrado ainda. Pesquise, encontre e registre aqui.'));
+    return;
+  }
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Data'),el('th',{},'Item'),el('th',{},'Onde'),
+    el('th',{class:'n'},'Pedido'),el('th',{class:'n'},'vs novo'),el('th',{}))));
+  const tb=el('tbody');
+  list.slice().sort((a,b)=>b.id-a.id).forEach(g=>{
+    const alvo=ALVOS.find(x=>x.id===g.alvo);
+    const dif=alvo?alvo.novo-g.v:0;
+    const del=el('button',{class:'mini'},'excluir');
+    del.addEventListener('click',()=>{
+      save('achados',store('achados',[]).filter(x=>x.id!==g.id)); renderAchados();});
+    const onde=el('td',{});
+    onde.appendChild(el('span',{},g.f||'—'));
+    if(g.l){ onde.appendChild(el('br'));
+      const href=/^https?:\/\//.test(g.l)?g.l:'https://'+g.l;
+      const a=el('a',{href,target:'_blank',rel:'noopener',
+        style:'color:var(--aco);font-size:12.5px;word-break:break-all'},g.l);
+      onde.appendChild(a); }
+    tb.appendChild(el('tr',{},
+      el('td',{class:'n'},g.d),
+      el('td',{},alvo?alvo.item:g.alvo),
+      onde,
+      el('td',{class:'n'},g.v?brl(g.v):'a cotar'),
+      // sem alvo correspondente (areia, brita e afins) não há "preço de novo" para comparar
+      el('td',{class:'n',style:!alvo?'color:var(--ink3)':(dif>0?'color:var(--ok);font-weight:600':'color:var(--terra)')},
+        !alvo?'—':(dif>0?'−':'+')+brl(Math.abs(dif)).replace('R$ ','')),
+      el('td',{style:'text-align:right'},del)));
+  });
+  t.appendChild(tb);
+}
+
+function renderFontes(){
+  const box=document.getElementById('fontesList'); box.textContent='';
+  const tipos=[...new Set(FONTES.map(f=>f.tipo))];
+  tipos.forEach(tp=>{
+    const ul=el('ul',{class:'chk'});
+    FONTES.filter(f=>f.tipo===tp).forEach(f=>{
+      const li=el('li',{});
+      const href=f.url;
+      li.appendChild(el('div',{class:'txt'},
+        el('span',{class:'tag'},tp),' ',
+        el('a',{href,target:'_blank',rel:'noopener',
+          style:'color:var(--ink);font-weight:650;text-decoration:none'},f.nome),
+        ' ',el('span',{style:'color:var(--ink3);font-size:12.5px'},'· '+f.local),
+        el('br'),el('span',{style:'color:var(--ink2);font-size:13.5px'},f.detalhe)));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  });
+}
+
+document.getElementById('btnAddAchado').addEventListener('click',()=>{
+  const alvo=aSel.value;
+  const v=+document.getElementById('aPreco').value;
+  const f=document.getElementById('aFonte').value.trim();
+  const l=document.getElementById('aLink').value.trim();
+  if(!(v>0)||!f){ alert('Preencha ao menos o preço pedido e onde você encontrou.'); return; }
+  const d=new Date(), pad=n=>String(n).padStart(2,'0');
+  const list=store('achados',[]);
+  list.push({id:Date.now(),alvo,v,f,l,d:`${pad(d.getDate())}/${pad(d.getMonth()+1)}`});
+  save('achados',list);
+  document.getElementById('aPreco').value='';
+  document.getElementById('aFonte').value='';
+  document.getElementById('aLink').value='';
+  renderAchados();
+});
+
+/* ============ gastos ============ */
+
+const gSel=document.getElementById('gEtapa');
+ETAPAS.forEach(e=>gSel.appendChild(el('option',{value:String(e.n)},`${e.n} — ${e.nome}`)));
+document.getElementById('gData').valueAsDate=new Date();
+
+function renderGastos(){
+  const gs=store('gastos',[]);
+  const tot=gs.reduce((a,g)=>a+g.v,0);
+  const orc=ETAPAS.reduce((a,e)=>a+e.mat+e.tec,0)*1.10;
+
+  const cards=document.getElementById('gastoCards'); cards.textContent='';
+  const mk=(k,v,sub,hi)=>{const c=el('div',{class:'card'+(hi?' hi':'')});
+    c.appendChild(el('p',{class:'k'},k));
+    const p=el('p',{class:'v'},v); if(sub)p.appendChild(el('small',{},' '+sub));
+    c.appendChild(p); return c;};
+  cards.appendChild(mk('Já gasto',brl(tot),`em ${gs.length} lançamento${gs.length===1?'':'s'}`));
+  cards.appendChild(mk('Orçado',brl(orc)));
+  cards.appendChild(mk('Falta',brl(Math.max(0,orc-tot))));
+  cards.appendChild(mk('Percentual da obra',(orc?Math.round(tot/orc*100):0)+'%','concluído em valor',true));
+
+  const t=document.getElementById('gastosTable'); t.textContent='';
+  if(!gs.length){ t.appendChild(el('caption',{class:'empty'},'Nenhum gasto lançado ainda.')); return; }
+  t.appendChild(el('thead',{},el('tr',{},
+    el('th',{},'Data'),el('th',{},'Descrição'),el('th',{class:'n'},'Etapa'),
+    el('th',{class:'n'},'Valor'),el('th',{}))));
+  const tb=el('tbody');
+  gs.slice().sort((a,b)=>b.d.localeCompare(a.d)).forEach(g=>{
+    const del=el('button',{class:'mini'},'excluir');
+    del.addEventListener('click',()=>{save('gastos',store('gastos',[]).filter(x=>x.id!==g.id));renderGastos();});
+    tb.appendChild(el('tr',{},
+      el('td',{class:'n'},g.d.split('-').reverse().join('/')),
+      el('td',{},g.t),el('td',{class:'n'},String(g.e)),
+      el('td',{class:'n'},brl(g.v)),el('td',{style:'text-align:right'},del)));
+  });
+  t.appendChild(tb);
+  t.appendChild(el('tfoot',{},el('tr',{},
+    el('td',{}),el('td',{},'Total lançado'),el('td',{}),
+    el('td',{class:'n'},brl(tot)),el('td',{}))));
+}
+
+document.getElementById('btnAddGasto').addEventListener('click',()=>{
+  const d=document.getElementById('gData').value;
+  const t=document.getElementById('gDesc').value.trim();
+  const v=+document.getElementById('gValor').value;
+  if(!d||!t||!(v>0)){alert('Preencha a data, a descrição e um valor maior que zero.');return;}
+  const gs=store('gastos',[]);
+  gs.push({id:Date.now(),d,t,e:+gSel.value,v});
+  save('gastos',gs);
+  document.getElementById('gDesc').value=''; document.getElementById('gValor').value='';
+  renderGastos();
+});
+
+/* ============ boot ============ */
+
+const cfg=store('cfg',null);
+if(cfg){ inCap.value=cfg.c; inMes.value=cfg.m; inEcon.value=cfg.e; }
+
+/* Achados da pesquisa de 04/09/2026. Entram uma única vez; depois é só o Renan
+   que mexe. Apagar um aqui na tela não faz ele voltar. */
+if(!store('seed-2026-09-04',false)){
+  const seed=[
+    { alvo:'betoneira', v:198,  f:'OLX — aluguel de betoneira 400 L · Goiânia, Goiânia 2',
+      l:'https://www.olx.com.br/materiais-de-construcao/ferramentas-de-construcao/betoneiras/estado-go/grande-goiania-e-anapolis' },
+    { alvo:'betoneira', v:2600, f:'OLX — “betoneira barata” · Aparecida de Goiânia, Vila Oliveira',
+      l:'https://www.olx.com.br/materiais-de-construcao/ferramentas-de-construcao/betoneiras/estado-go/grande-goiania-e-anapolis' },
+    { alvo:'betoneira', v:3199, f:'OLX — CSM 400 L monofásica 220 V · Aparecida, Cidade Satélite São Luiz',
+      l:'https://www.olx.com.br/materiais-de-construcao/ferramentas-de-construcao/betoneiras/estado-go/grande-goiania-e-anapolis' },
+    { alvo:'forma',     v:200,  f:'OLX — lote de madeira · Senador Canedo, Jardim Canedo',
+      l:'https://www.olx.com.br/materiais-de-construcao/estado-go/grande-goiania-e-anapolis?q=madeira' },
+    { alvo:'forma',     v:0,    f:'OLX — doação de madeira, MDF e MDP · Goiânia, Setor Centro Oeste',
+      l:'https://www.olx.com.br/materiais-de-construcao/estado-go/grande-goiania-e-anapolis?q=madeira' }
+  ];
+  save('achados', store('achados',[]).concat(
+    seed.map((s,i)=>Object.assign({id:1757010000000+i, d:'04/09'}, s))));
+  save('seed-2026-09-04', true);
+}
+
+/* Achados da pesquisa de 07/09/2026 na OLX — areia e brita, as duas linhas do
+   alicerce que estavam sem fonte. Valores são de CARGA FECHADA, não de m³. */
+if(!store('seed-2026-09-07',false)){
+  const L='https://go.olx.com.br/grande-goiania-e-anapolis/materiais-de-construcao/fundacao-e-estrutura/';
+  const seed=[
+    { alvo:'Areia média — caminhão 8 m³', v:1392,
+      f:'Expansul · Aparecida de Goiânia · WhatsApp (62) 9 9493-7050. Tabela publicada no anúncio: R$ 174/m³. Caminhão de 13 m³ sai R$ 2.250.',
+      l:L+'areias-e-britas-1357039647' },
+    { alvo:'Brita 1 — caminhão 10 t', v:1540,
+      f:'Expansul · mesmo anúncio. 10 t ≈ 6,7 m³, dá R$ 231/m³. Caminhão de 15 t por R$ 2.310.',
+      l:L+'areias-e-britas-1357039647' },
+    { alvo:'Brita + areia — caminhão fechado', v:970,
+      f:'Senador Canedo, Jardim das Oliveiras · R$ 1.000, ou R$ 970 no Pix, 3x sem juros. NÃO DIZ A QUANTIDADE e o vendedor tem 1 venda cancelada e 0 concluídas — perguntar quantos m³ antes de qualquer coisa.',
+      l:'https://go.olx.com.br/grande-goiania-e-anapolis/materiais-de-construcao/alvenaria/vendo-brita-e-areia-caminha-fechado-1527274961' },
+    { alvo:'Britas 0, 1, 2 e pó', v:220,
+      f:'Aparecida de Goiânia, Jardim Helvécia · anúncio de 05/07. R$ 220 provavelmente por m³. WhatsApp escondido, precisa de login na OLX.',
+      l:L+'britas-promocao-1496588998' },
+    { alvo:'Brita direto da pedreira', v:0,
+      f:'Tijolo e Areia Atacado · Jardim Curitiba, Goiânia · WhatsApp (62) 9 9238-9683. "Lavada e sem pó", conta verificada desde 2021. Sem preço no anúncio — cotar.',
+      l:L+'brita-1287296345' },
+    { alvo:'Areia, terra e brita', v:900,
+      f:'Jardim Mont Serrat, Aparecida de Goiânia · anúncio de 06/09, o mais recente. Parcela no cartão. WhatsApp escondido, precisa de login.',
+      l:L+'areia-1532988385' },
+
+    /* Facebook — Marketplace e grupo DESAPEGOS, pesquisa de 07/09/2026 */
+    { alvo:'⭐ Areia de rio lavada — 7 m³', v:910,
+      f:'MAIS BARATA QUE ACHEI. Aparecida de Goiânia · R$ 130 o metro, carga fechada de 7 m³ = R$ 910. Areia fina, média e grossa, entrega agendada em Aparecida e região. Contato pelo Messenger do anúncio — o telefone está na foto. Confirmar que os R$ 130 são por metro antes de fechar.',
+      l:'https://www.facebook.com/marketplace/item/2131040780814180/' },
+    { alvo:'Areia lavada — por metro', v:120,
+      f:'Goiânia · "areia lavada 120 reais o metro", dito no texto do anúncio. Zap escondido, chamar pelo Messenger. É o menor preço por metro que apareceu — mas é Goiânia, conferir o frete até Aparecida.',
+      l:'https://www.facebook.com/marketplace/item/1856853918607805/' },
+    { alvo:'Areia de rio — cargas de 7 e 13 m³', v:0,
+      f:'Goiânia · WhatsApp (62) 9 9460-1028, número publicado na própria foto do anúncio. Trabalha com carga de 7 e de 13 metros. Sem preço no texto — cotar.',
+      l:'https://www.facebook.com/marketplace/item/27773666998962739/' },
+    { alvo:'Areia e brita — toco e truck', v:750,
+      f:'Senador Canedo · WhatsApp (62) 9 9339-6908. "A partir de R$ 750" o caminhão toco, areia, brita, pó de brita, terra e cascalho. Diz que COBRE QUALQUER OFERTA — usar como carta na manga depois de ter as outras cotações na mão.',
+      l:'https://www.facebook.com/marketplace/item/2321739361900761/' },
+    { alvo:'Britas 0,1,2,3 + areia — parcela no cartão', v:0,
+      f:'Talita Assunção, grupo DESAPEGOS · WhatsApp (62) 9 9164-4263. Entrega em Aparecida de Goiânia, Goiânia e Senador Canedo, caminhão toco e trucado. PASSA CARTÃO E PARCELA — é o único que anuncia isso, e com aporte de R$ 1.000/mês isso vale mais que desconto.',
+      l:'https://www.facebook.com/groups/709018679208728/search/?q=brita' },
+    { alvo:'HF Areia e Brita', v:830,
+      f:'Aparecida de Goiânia, grupo DESAPEGOS · R$ 830, "areia e brita direto na sua obra, entrega rápida". Contato pelo Messenger. Não diz a quantidade — perguntar quantos m³.',
+      l:'https://www.facebook.com/groups/709018679208728/search/?q=areia' }
+  ];
+  save('achados', store('achados',[]).concat(
+    seed.map((s,i)=>Object.assign({id:1757270000000+i, d:'07/09'}, s))));
+  save('seed-2026-09-07', true);
+}
+
+plantaSalva();   // reaplica o que o Renan ajustou no modo de edição
+drawPlan();
+renderAreas();
+if(window.Maquete3D){
+  Maquete3D.ligarBotoes();
+  document.getElementById('v3info').innerHTML =
+    '<p style="margin:0"><b>O que a maquete é e o que ela não é.</b> A geometria vem da planta — '+
+    'medidas, aberturas e etapas são as de verdade, e mexer na aba Planta muda aqui. '+
+    'Os acabamentos são a leitura do vídeo da casa de referência: cor, ripado, bancada e '+
+    'esquadria estão ali para você ver a casa, não para servir de projeto executivo. '+
+    'A área gourmet dos fundos aparece só quando ligada, porque ainda não tem orçamento.</p>';
+}
+renderEtapas();
+renderMoney();
+renderAlicerce();
+renderCompras();
+renderAchados();
+renderGastos();
+selectRoom('q1');
+</script>
+</body>
+</html>
