@@ -439,11 +439,11 @@ const AMBIENTES = [
     obs:'A faixa de 1,00 m que sobra dos 4,00 de largura depois dos 3,00 do quarto, correndo os 4,20 m INTEIROS do bloco da frente — 3,00 ao lado do quarto e 1,20 ao lado do banheiro. É ABERTA: sem parede na frente e sem parede para o corredor, recuada para dentro do contorno. Funciona como um mini corredor coberto pelo beiral: as portas do quarto 01 e do banheiro abrem para cá, e no fundo dela fica a porta da sala. NÃO É ÁREA CONSTRUÍDA.' },
   { id:'q1', nome:'Quarto 01', x:5.00, y:3.40, w:3.00, h:3.00, etapa:1,
     obs:'Os 3,00 × 3,00 escritos no esboço, encostado na divisa cega. Cama de casal com cabeceira na fachada frontal e guarda-roupa na parede do nicho. Janela na fachada frontal, dando para a garagem. Porta abrindo para o nicho, que é coberto.' },
-  { id:'corr1', nome:'Corredor de acesso', short:'ACESSO', x:8.00, y:3.40, w:1.20, h:0.80,
+  { id:'banho', nome:'Banheiro', x:8.00, y:3.40, w:1.20, h:2.20, etapa:1,
+    obs:'2,20 de comprimento × 1,20 de profundidade = 2,64 m². Encosta no nicho, então mantém a basculante e ventila de verdade. A porta não abre para o quarto: abre para o pequeno VÃO do canto, no plano da parede. Entra-se primeiro no quarto e de lá no vão — o banheiro é suíte do quarto 01.' },
+  { id:'vao1', nome:'Vão do banheiro', short:'VÃO', x:8.00, y:5.60, w:1.20, h:0.80,
     etapa:1, small:true,
-    obs:'Os 0,80 m que o Renan tirou do comprimento do banheiro. Abre direto no nicho, sem porta, e distribui: o quarto 01 fica à esquerda de quem entra, o banheiro em frente. É o que separa a porta do quarto da porta do banheiro em vez de deixar as duas encostadas.' },
-  { id:'banho', nome:'Banheiro', x:8.00, y:4.20, w:1.20, h:2.20, etapa:1,
-    obs:'2,20 de comprimento × 1,20 de profundidade = 2,64 m². Encolheu 0,80 para abrir o corredor de acesso. Box de vidro e nicho embutido. A porta abre para o corredorzinho. ATENÇÃO: ele deixou de encostar no nicho, então não tem mais parede externa — a ventilação passa a ser basculante alta sobre a porta, tirando ar do corredor, que por sua vez é aberto no nicho. Funciona, mas é indireta: confirmar no Código de Obras de Aparecida.' },
+    obs:'O pequeno vão do esboço: 1,20 × 0,80 = 0,96 m², recuado no canto da divisa cega. É aberto para o quarto 01, sem porta, e é nele que fica a porta do banheiro. Serve para a porta do banheiro não dar direto no meio do quarto.' },
   { id:'sala', nome:'Sala + cozinha integradas', x:9.20, y:2.40, w:6.00, h:4.00, etapa:2,
     obs:'Os 4 × 6 do esboço. Painel ripado de madeira com a TV na divisa cega, bancada em L da cozinha também na divisa, e península voltada para a sala. Porta de saída lateral e duas janelas para o corredor.' },
   // `minus` faz a área da suíte descontar o banheiro sozinha — precisa ser dinâmico
@@ -867,7 +867,7 @@ function drawFurniture(){
   r(5.15,4.20,2.00,1.60,F); r(5.15,4.20,0.35,1.60,F2);
   r(5.15,5.95,1.80,0.45,F2);
   // banheiro — box no fundo e vaso no meio, longe do giro da porta
-  r(8.15,5.40,0.95,0.95,F2); r(8.20,4.70,0.45,0.55,F2);
+  r(8.12,4.45,0.95,0.95,F2); r(8.20,3.60,0.45,0.55,F2);
   // sala — ripado na divisa, sofá, mesa
   r(9.40,6.24,3.00,0.12,'var(--wood)');
   r(9.60,5.33,2.00,0.85,F);
@@ -890,8 +890,8 @@ function drawWalls(){
 
   // paredes internas. A parede em y=3,40 e a em x=9,20 acima dela viraram FACHADA:
   // dão para o nicho aberto, e é nelas que ficam as três portas da casa.
-  [[8.00,3.40,8.00,6.40],[8.00,4.20,9.20,4.20],[15.20,2.40,15.20,6.40],
-   [18.70,2.40,18.70,4.40],[18.70,4.40,20.20,4.40]]
+  [[8.00,3.40,8.00,5.60],[8.00,5.60,9.20,5.60],[9.20,3.40,9.20,6.40],
+   [15.20,2.40,15.20,6.40],[18.70,2.40,18.70,4.40],[18.70,4.40,20.20,4.40]]
     .forEach(w=>line(w[0],w[1],w[2],w[3],'var(--planWall)',4));
 
   // vãos internos que sobraram: passagem sala/quarto 02 e porta do banheiro da suíte
@@ -909,30 +909,33 @@ function drawWalls(){
 
   // janelas na fachada do corredor (y = 2,40): as duas da sala, o quarto 02
   // e o banheiro da suíte
-  const janelas=[[10.00,11.50],[12.20,13.70],[16.20,18.00],[19.05,19.95]];
+  const janelas=[[10.80,12.10],[12.60,13.90],[16.20,18.00],[19.05,19.95]];
   janelas.forEach(([a,b])=>{ line(a,2.40,b,2.40,'var(--planFill)',8); line(a,2.40,b,2.40,'var(--aco)',2); });
   // porta lateral da sala e porta do quintal, saindo da suíte
-  line(14.20,2.40,15.00,2.40,'var(--planFill)',8);
-  line(20.20,4.80,20.20,5.80,'var(--planFill)',8);
+  // porta lateral da sala, invertida de ponta em 07/09/2026: estava encostada no
+  // quarto 02 e passou para a ponta da frente, junto da entrada.
+  { const sl=amb2('sala'); if(sl){ line(sl.x+0.50,2.40,sl.x+1.30,2.40,'var(--planFill)',8); } }
+  // fundos da suíte: JANELA, não porta — o quarto do fim não tem saída para o quintal
+  line(20.20,4.60,20.20,6.00,'var(--planFill)',8); line(20.20,4.60,20.20,6.00,'var(--aco)',2);
 
-  // A BOCA DO CORREDOR DE ACESSO: aberta no nicho, sem porta, ocupando a largura
-  // toda do corredorzinho. É por ela que se chega ao quarto e ao banheiro.
-  const cr=amb2('corr1'), q1p=amb2('q1'), bhp=amb2('banho');
-  if(cr) line(cr.x,3.40,cr.x+cr.w,3.40,'var(--planFill)',8);
+  const q1p=amb2('q1'), bhp=amb2('banho');
 
-  // porta do quarto 01, na divisória x=8,00, abrindo para o corredorzinho
-  if(cr&&q1p){
-    const a=cr.y+0.05, b=cr.y+0.75;
-    line(q1p.x+q1p.w,a, q1p.x+q1p.w,b,'var(--planFill)',8);
-    root.appendChild(svg('path',{d:`M${mx(q1p.x+q1p.w)} ${my(b)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(q1p.x+q1p.w-(b-a))} ${my(b)}`,
+  // PORTA DO QUARTO 01, na parede do nicho, encostada na divisória do banheiro
+  if(q1p){
+    const a=q1p.x+q1p.w-1.05, b=q1p.x+q1p.w-0.15;
+    line(a,3.40,b,3.40,'var(--planFill)',8);
+    root.appendChild(svg('path',{d:`M${mx(a)} ${my(3.40)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(a)} ${my(3.40+(b-a))}`,
       fill:'none',stroke:'var(--ink2)','stroke-width':1.1}));
   }
-  // porta do banheiro, na parede y=4,20, de frente para quem entra no corredorzinho
-  if(bhp){
+  // O VÃO do canto abre no quarto 01 pela largura toda, sem porta. É um recuo,
+  // não um cômodo — e é dentro dele que fica a porta do banheiro.
+  const vo=amb2('vao1');
+  if(q1p&&vo) line(q1p.x+q1p.w,vo.y, q1p.x+q1p.w,vo.y+vo.h,'var(--planFill)',8);
+  // porta do banheiro, na parede y=5,60, no plano da parede — sem giro para fora
+  if(bhp&&vo){
     const a=bhp.x+0.25, b=bhp.x+0.95;
-    line(a,bhp.y,b,bhp.y,'var(--planFill)',8);
-    root.appendChild(svg('path',{d:`M${mx(a)} ${my(bhp.y)} A${(b-a)*S} ${(b-a)*S} 0 0 1 ${mx(a)} ${my(bhp.y+(b-a))}`,
-      fill:'none',stroke:'var(--ink2)','stroke-width':1.1}));
+    line(a,vo.y,b,vo.y,'var(--planFill)',8);
+    line(a,vo.y,b,vo.y,'var(--ink3)',1.6);
   }
   line(9.20,2.55,9.20,3.35,'var(--planFill)',8);
   root.appendChild(svg('path',{d:`M${mx(9.20)} ${my(3.35)} A${0.80*S} ${0.80*S} 0 0 1 ${mx(10.00)} ${my(3.35)}`,
